@@ -27,10 +27,14 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminPricing from "./pages/AdminPricing";
 import AdminUsers from "./pages/AdminUsers";
 import AdminInventory from "./pages/AdminInventory";
+import DemoSelector from "./pages/DemoSelector";
 
 function Router() {
   return (
     <Switch>
+      {/* Demo mode */}
+      <Route path={"/demo"} component={DemoSelector} />
+      
       {/* Public pages */}
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />

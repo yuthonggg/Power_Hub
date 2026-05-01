@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import DemoModeToggle from './DemoModeToggle';
 
 interface NavbarProps {
   showAuth?: boolean;
@@ -50,6 +51,7 @@ export default function Navbar({ showAuth = true }: NavbarProps) {
 
           {isAuthenticated && user && (
             <div className="flex items-center gap-4">
+              <DemoModeToggle />
               <div className="text-right">
                 <p className="text-sm font-medium">{user.name}</p>
                 <p className="text-xs text-muted-foreground capitalize">
