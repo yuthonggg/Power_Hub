@@ -21,6 +21,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const [, setLocation] = useLocation();
@@ -37,7 +38,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !address) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -63,6 +64,7 @@ export default function Register() {
         name,
         email,
         role,
+        address,
       };
 
       if (role === 'prosumer') {
@@ -179,6 +181,17 @@ export default function Register() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="address">Service/Home Address</Label>
+              <Input
+                id="address"
+                placeholder="123 Jalan Ampang, 50450 Kuala Lumpur"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 disabled={loading}
               />
             </div>
