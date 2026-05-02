@@ -105,18 +105,7 @@ export default function ProsumerDashboard() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-4">
-          {/* Current Generation */}
-          <div className="card-soft p-6 border-l-4 border-power-green">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Current Generation</p>
-                <p className="text-3xl font-bold text-power-green">{currentGeneration} kW</p>
-                <p className="text-xs text-muted-foreground mt-1">Real-time</p>
-              </div>
-              <Sun className="w-8 h-8 text-power-green/50" />
-            </div>
-          </div>
+        <div className="grid md:grid-cols-3 gap-4">
 
           {/* Current Earnings Rate */}
           <div className="card-soft p-6 border-l-4 border-power-amber">

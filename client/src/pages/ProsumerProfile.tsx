@@ -120,67 +120,6 @@ export default function ProsumerProfile() {
           </div>
         </div>
 
-        {/* TNB Linkage */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">TNB Linkage</h2>
-
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Connected TNB Account</p>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">****5678</Badge>
-                <Button variant="ghost" size="sm">
-                  Update
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Last Sync</p>
-              <p className="text-sm">Simulated — 5 minutes ago</p>
-            </div>
-
-            <div className="pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                Your TNB account is linked for real-time monitoring and billing integration.
-                Updates sync automatically every 15 minutes.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* System Health */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">System Health</h2>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-600 rounded-full" />
-                <span className="text-sm font-medium">All Systems Operational</span>
-              </div>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                ✓ Good
-              </Badge>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-600 rounded-full" />
-                <span className="text-sm font-medium">Last Maintenance</span>
-              </div>
-              <span className="text-sm text-muted-foreground">2025-04-10</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-amber-600 rounded-full" />
-                <span className="text-sm font-medium">Next Scheduled Maintenance</span>
-              </div>
-              <span className="text-sm text-muted-foreground">2025-07-10</span>
-            </div>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );

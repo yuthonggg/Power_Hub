@@ -62,9 +62,14 @@ export default function ProsumerAccountProfile() {
                 <p className="text-2xl font-bold text-power-green">
                   RM {user.eWalletBalance.toFixed(2)}
                 </p>
-                <Button variant="outline" size="sm">
-                  Withdraw
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    Deposit
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Withdraw
+                  </Button>
+                </div>
               </div>
             </div>
 

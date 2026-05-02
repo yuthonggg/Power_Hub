@@ -14,8 +14,9 @@ import {
 } from 'recharts';
 import { Wallet, TrendingUp, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const monthlyEarningsData = [
+const monthlyEarningsData2025 = [
   { month: 'Jan', earnings: 68 },
   { month: 'Feb', earnings: 72 },
   { month: 'Mar', earnings: 85 },
@@ -28,6 +29,21 @@ const monthlyEarningsData = [
   { month: 'Oct', earnings: 88 },
   { month: 'Nov', earnings: 76 },
   { month: 'Dec', earnings: 70 },
+];
+
+const monthlyEarningsData2024 = [
+  { month: 'Jan', earnings: 55 },
+  { month: 'Feb', earnings: 58 },
+  { month: 'Mar', earnings: 62 },
+  { month: 'Apr', earnings: 65 },
+  { month: 'May', earnings: 71 },
+  { month: 'Jun', earnings: 80 },
+  { month: 'Jul', earnings: 85 },
+  { month: 'Aug', earnings: 82 },
+  { month: 'Sep', earnings: 78 },
+  { month: 'Oct', earnings: 75 },
+  { month: 'Nov', earnings: 68 },
+  { month: 'Dec', earnings: 65 },
 ];
 
 const earningsHistory = [
@@ -71,7 +87,7 @@ export default function ProsumerEarnings() {
     { label: 'Account Profile', href: '/prosumer/account' },
   ];
 
-  const thisMonthEarnings = monthlyEarningsData[4].earnings; // May
+  const thisMonthEarnings = monthlyEarningsData2025[4].earnings; // May
   const lifetimeEarnings = user.totalEarningsRM || 4232.50;
   const totalExported = user.totalExportedKwh || 12450;
 
@@ -123,16 +139,41 @@ export default function ProsumerEarnings() {
 
         {/* Monthly Earnings Chart */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Monthly Earnings — Last 12 Months</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyEarningsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value: number) => [`RM ${value.toFixed(2)}`, 'Earnings']} />
-              <Bar dataKey="earnings" fill="#1D9E75" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Monthly Earnings</h2>
+          </div>
+          <Tabs defaultValue="2025" className="w-full">
+            <div className="flex justify-end mb-4">
+              <TabsList className="grid w-[200px] grid-cols-2">
+                <TabsTrigger value="2025">2025</TabsTrigger>
+                <TabsTrigger value="2024">2024</TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="2025">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyEarningsData2025}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value: number) => [`RM ${value.toFixed(2)}`, 'Earnings']} />
+                  <Bar dataKey="earnings" fill="#1D9E75" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </TabsContent>
+            
+            <TabsContent value="2024">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyEarningsData2024}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value: number) => [`RM ${value.toFixed(2)}`, 'Earnings']} />
+                  <Bar dataKey="earnings" fill="#1D9E75" radius={[8, 8, 0, 0]} opacity={0.7} />
+                </BarChart>
+              </ResponsiveContainer>
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Daily Earnings Log */}
