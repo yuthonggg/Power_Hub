@@ -245,7 +245,7 @@ export default function ProsumerDashboard() {
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 font-semibold">Date</th>
                   <th className="text-right py-3 px-4 font-semibold">Energy Sold</th>
-                  <th className="text-right py-3 px-8 font-semibold">Earnings</th>
+                  <th className="text-right py-3 pr-12 font-semibold">Earnings</th>
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -254,7 +254,7 @@ export default function ProsumerDashboard() {
                   <tr key={idx} className="border-b border-border hover:bg-secondary/50">
                     <td className="py-3 px-4">{tx.date}</td>
                     <td className="text-right py-3 px-4 font-semibold">{tx.kwh} kWh</td>
-                    <td className="text-right py-3 px-8 font-semibold text-power-green">RM {tx.earnings.toFixed(2)}</td>
+                    <td className="text-right py-3 pr-12 font-semibold text-power-green">RM {tx.earnings.toFixed(2)}</td>
                     <td className="py-3 px-4">
                       <Badge className="bg-green-100 text-green-800 border-green-200">
                         ✓ {tx.status}

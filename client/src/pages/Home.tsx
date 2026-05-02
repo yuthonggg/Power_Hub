@@ -181,8 +181,8 @@ export default function Home() {
                   <p className="text-3xl font-bold text-power-green">34 sen</p>
                 </div>
                 <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-2">vs Solar ATAP</p>
-                  <p className="text-lg font-semibold text-green-600">+25% more earnings</p>
+                  <p className="text-sm text-muted-foreground mb-2">vs Traditional Export</p>
+                  <p className="text-lg font-semibold text-green-600">Higher returns</p>
                 </div>
               </div>
             </div>

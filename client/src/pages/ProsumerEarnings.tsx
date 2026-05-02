@@ -186,7 +186,7 @@ export default function ProsumerEarnings() {
                   <th className="text-left py-3 px-4 font-semibold">Date</th>
                   <th className="text-right py-3 px-4 font-semibold">Energy Sold</th>
                   <th className="text-right py-3 px-4 font-semibold">Rate</th>
-                  <th className="text-right py-3 px-8 font-semibold">Earnings</th>
+                  <th className="text-right py-3 pr-12 font-semibold">Earnings</th>
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -196,7 +196,7 @@ export default function ProsumerEarnings() {
                     <td className="py-3 px-4">{entry.date}</td>
                     <td className="text-right py-3 px-4 font-semibold">{entry.kwh} kWh</td>
                     <td className="text-right py-3 px-4">RM {entry.rate.toFixed(2)}/kWh</td>
-                    <td className="text-right py-3 px-8 font-semibold text-power-green">RM {entry.earnings.toFixed(2)}</td>
+                    <td className="text-right py-3 pr-12 font-semibold text-power-green">RM {entry.earnings.toFixed(2)}</td>
                     <td className="py-3 px-4">
                       <Badge className="bg-green-100 text-green-800 border-green-200">
                         ✓ {entry.type}
