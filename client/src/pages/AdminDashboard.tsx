@@ -1,61 +1,24 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import StatCard from '@/components/StatCard';
-import EnergyMeter from '@/components/EnergyMeter';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-import { Users, Zap, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { Users, Zap, TrendingUp, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const freeToGridData = [
-  { day: 'Mon', kWh: 120 },
-  { day: 'Tue', kWh: 95 },
-  { day: 'Wed', kWh: 140 },
-  { day: 'Thu', kWh: 110 },
-  { day: 'Fri', kWh: 105 },
-  { day: 'Sat', kWh: 130 },
-  { day: 'Sun', kWh: 125 },
-];
-
-const inventoryData = [
-  { day: 'Day 1', inventory: 35 },
-  { day: 'Day 2', inventory: 42 },
-  { day: 'Day 3', inventory: 55 },
-  { day: 'Day 4', inventory: 48 },
-  { day: 'Day 5', inventory: 62 },
-  { day: 'Day 6', inventory: 58 },
-  { day: 'Day 7', inventory: 65 },
-];
-
-const alerts = [
-  {
-    type: 'warning',
-    title: 'Inventory Above Threshold',
-    message: 'Platform inventory at 65% - approaching cap threshold (85%)',
-  },
-  {
-    type: 'error',
-    title: 'Payout Failed',
-    message: '3 prosumers have pending payouts exceeding 48 hours',
-  },
-  {
-    type: 'success',
-    title: 'System Operating Normally',
-    message: 'All systems green. No critical issues detected.',
-  },
+const supplyDemandData = [
+  { day: '1', supply: 245, demand: 218 },
+  { day: '2', supply: 252, demand: 225 },
+  { day: '3', supply: 268, demand: 240 },
+  { day: '4', supply: 235, demand: 228 },
+  { day: '5', supply: 280, demand: 245 },
+  { day: '6', supply: 290, demand: 250 },
+  { day: '7', supply: 275, demand: 260 },
+  { day: '8', supply: 310, demand: 280 },
+  { day: '9', supply: 305, demand: 285 },
+  { day: '10', supply: 320, demand: 295 },
 ];
 
 export default function AdminDashboard() {
@@ -75,10 +38,9 @@ export default function AdminDashboard() {
 
   const navItems = [
     { label: 'Overview', href: '/admin' },
-    { label: 'Pricing Control', href: '/admin/pricing' },
-    { label: 'User Management', href: '/admin/users' },
-    { label: 'Inventory Manager', href: '/admin/inventory' },
-    { label: 'Reports', href: '/admin/reports' },
+    { label: 'Pricing', href: '/admin/pricing' },
+    { label: 'Users', href: '/admin/users' },
+    { label: 'Inventory', href: '/admin/inventory' },
   ];
 
   return (
@@ -87,222 +49,165 @@ export default function AdminDashboard() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold mb-2">Platform Overview</h1>
-          <p className="text-muted-foreground">
-            Real-time monitoring and control of Power Hub operations
-          </p>
+          <p className="text-muted-foreground">Monitor platform health and key metrics</p>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard
-            icon={Users}
-            label="Total Prosumers"
-            value="342"
-            color="green"
-          />
-          <StatCard
-            icon={Users}
-            label="Total Consumers"
-            value="1,248"
-            color="blue"
-          />
-          <StatCard
-            label="Platform Revenue"
-            value="RM 4,520"
-            unit="Today"
-            color="amber"
-          />
-          <StatCard
-            icon={Zap}
-            label="Total kWh Traded"
-            value="45,230"
-            color="green"
-          />
-          <StatCard
-            label="Inventory Level"
-            value={platformInventory.toFixed(0)}
-            unit="%"
-            color={platformInventory > 85 ? 'red' : platformInventory > 70 ? 'amber' : 'green'}
-          />
-        </div>
-
-        {/* Live Energy Flow and Inventory Gauge */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Live Energy Flow */}
-          <div className="lg:col-span-2 card-soft p-6">
-            <h2 className="text-lg font-semibold mb-6">Live Energy Flow</h2>
-            <div className="flex items-center justify-between">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-power-green/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Zap className="w-8 h-8 text-power-green" />
-                </div>
-                <p className="font-semibold">Prosumers</p>
-                <p className="text-sm text-muted-foreground">342 active</p>
-                <p className="text-lg font-bold text-power-green mt-2">245 kWh/h</p>
+        {/* Key Metrics */}
+        <div className="grid md:grid-cols-4 gap-4">
+          {/* Total Prosumers */}
+          <div className="card-soft p-6 border-l-4 border-power-green">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Prosumers</p>
+                <p className="text-3xl font-bold text-power-green">145</p>
               </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Exporting</p>
-                  <div className="text-2xl">→</div>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-power-amber/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Zap className="w-8 h-8 text-power-amber" />
-                </div>
-                <p className="font-semibold">Platform</p>
-                <p className="text-sm text-muted-foreground">Inventory</p>
-                <p className="text-lg font-bold text-power-amber mt-2">
-                  {platformInventory.toFixed(0)}%
-                </p>
-              </div>
-
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Supplying</p>
-                  <div className="text-2xl">→</div>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-power-blue/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Zap className="w-8 h-8 text-power-blue" />
-                </div>
-                <p className="font-semibold">Consumers</p>
-                <p className="text-sm text-muted-foreground">1,248 active</p>
-                <p className="text-lg font-bold text-power-blue mt-2">218 kWh/h</p>
-              </div>
+              <Zap className="w-8 h-8 text-power-green/50" />
             </div>
+            <p className="text-xs text-muted-foreground mt-2">+12 this month</p>
           </div>
 
-          {/* Inventory Gauge */}
-          <div className="card-soft p-6 flex flex-col items-center justify-center">
-            <EnergyMeter
-              value={platformInventory}
-              label="Platform Inventory"
-              color={platformInventory > 85 ? 'red' : platformInventory > 70 ? 'amber' : 'green'}
-              size="lg"
-            />
-            {platformInventory > 85 && (
-              <div className="mt-4 p-3 bg-red-50 rounded-lg text-center">
-                <p className="text-xs font-semibold text-red-600">
-                  ⚠️ Auto-cap active - prosumers capped
-                </p>
+          {/* Total Consumers */}
+          <div className="card-soft p-6 border-l-4 border-power-blue">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Consumers</p>
+                <p className="text-3xl font-bold text-power-blue">328</p>
               </div>
-            )}
+              <Users className="w-8 h-8 text-power-blue/50" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">+28 this month</p>
+          </div>
+
+          {/* Current Rate */}
+          <div className="card-soft p-6 border-l-4 border-power-amber">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Current Rate</p>
+                <p className="text-3xl font-bold text-power-amber">44 sen</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-power-amber/50" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">per kWh</p>
+          </div>
+
+          {/* Inventory Status */}
+          <div className="card-soft p-6 border-l-4 border-power-purple">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Inventory</p>
+                <p className="text-3xl font-bold text-power-purple">68%</p>
+              </div>
+              <AlertCircle className="w-8 h-8 text-power-purple/50" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">Full capacity</p>
           </div>
         </div>
 
-        {/* Alerts */}
+        {/* Supply vs Demand */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Active Alerts</h2>
-          <div className="space-y-3">
-            {alerts.map((alert, idx) => (
-              <div
-                key={idx}
-                className={`p-4 rounded-lg border-l-4 ${
-                  alert.type === 'error'
-                    ? 'bg-red-50 border-red-500'
-                    : alert.type === 'warning'
-                    ? 'bg-amber-50 border-amber-500'
-                    : 'bg-green-50 border-green-500'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {alert.type === 'error' && (
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  )}
-                  {alert.type === 'warning' && (
-                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  )}
-                  {alert.type === 'success' && (
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  )}
-                  <div>
-                    <p
-                      className={`font-semibold ${
-                        alert.type === 'error'
-                          ? 'text-red-900'
-                          : alert.type === 'warning'
-                          ? 'text-amber-900'
-                          : 'text-green-900'
-                      }`}
-                    >
-                      {alert.title}
-                    </p>
-                    <p
-                      className={`text-sm mt-1 ${
-                        alert.type === 'error'
-                          ? 'text-red-700'
-                          : alert.type === 'warning'
-                          ? 'text-amber-700'
-                          : 'text-green-700'
-                      }`}
-                    >
-                      {alert.message}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Grid Export Tracker */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Grid Export Tracker</h2>
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Free-to-Grid (Lifetime)</p>
-              <p className="text-3xl font-bold text-power-green">8,420 kWh</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Today's Free-to-Grid</p>
-              <p className="text-3xl font-bold text-power-amber">125 kWh</p>
-            </div>
-          </div>
+          <h2 className="text-lg font-semibold mb-4">Supply vs Demand - Last 10 Days</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={freeToGridData}>
+            <LineChart data={supplyDemandData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="day" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="kWh" fill="#EF9F27" name="Free to Grid" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Inventory History */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Inventory History - Last 7 Days</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={inventoryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="day" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Legend />
               <Line
                 type="monotone"
-                dataKey="inventory"
+                dataKey="supply"
                 stroke="#1D9E75"
                 strokeWidth={2}
-                dot={{ fill: '#1D9E75', r: 4 }}
-                name="Inventory %"
+                name="Prosumer Supply (kWh/h)"
               />
               <Line
                 type="monotone"
-                dataKey={() => 85}
-                stroke="#EF9F27"
+                dataKey="demand"
+                stroke="#378ADD"
                 strokeWidth={2}
-                strokeDasharray="5 5"
-                name="Cap Threshold"
-                dot={false}
+                name="Consumer Demand (kWh/h)"
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-4">Pricing Control</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Adjust monthly rates and review pricing formula
+            </p>
+            <Button className="w-full bg-power-amber hover:bg-power-amber/90">
+              Manage Pricing
+            </Button>
+          </div>
+
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-4">User Management</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Review users, verify accounts, and manage access
+            </p>
+            <Button className="w-full bg-power-blue hover:bg-power-blue/90">
+              Manage Users
+            </Button>
+          </div>
+
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-4">Inventory Manager</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Monitor energy pool and set export limits
+            </p>
+            <Button className="w-full bg-power-green hover:bg-power-green/90">
+              Manage Inventory
+            </Button>
+          </div>
+        </div>
+
+        {/* Platform Stats */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">Monthly Metrics</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Energy Traded</span>
+                <span className="font-medium">2,850 kWh</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Revenue</span>
+                <span className="font-medium text-power-green">RM 1,254</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Avg. Rate</span>
+                <span className="font-medium">44 sen/kWh</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">CO₂ Avoided</span>
+                <span className="font-medium">1,667 kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">System Health</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">API Status</span>
+                <Badge className="bg-green-100 text-green-800">Operational</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Database</span>
+                <Badge className="bg-green-100 text-green-800">Healthy</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Uptime</span>
+                <Badge className="bg-green-100 text-green-800">99.9%</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Last Sync</span>
+                <span className="font-medium">2 min ago</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

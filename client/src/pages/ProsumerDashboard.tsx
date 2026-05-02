@@ -1,273 +1,160 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import StatCard from '@/components/StatCard';
-import EnergyMeter from '@/components/EnergyMeter';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import {
-  Zap,
-  TrendingUp,
-  Wallet,
-  AlertCircle,
-  CheckCircle,
-  Leaf,
-  Clock,
-} from 'lucide-react';
+import { Sun, TrendingUp, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const generationData = [
-  { time: '6am', kWh: 0.1 },
-  { time: '9am', kWh: 2.5 },
-  { time: '12pm', kWh: 5.5 },
-  { time: '3pm', kWh: 4.2 },
-  { time: '6pm', kWh: 1.8 },
-  { time: '9pm', kWh: 0 },
-];
-
-const monthlyData = [
-  { month: 'Jan', earnings: 320 },
-  { month: 'Feb', earnings: 380 },
-  { month: 'Mar', earnings: 450 },
-  { month: 'Apr', earnings: 520 },
-  { month: 'May', earnings: 580 },
-  { month: 'Jun', earnings: 620 },
-];
-
-const transactionData = [
-  {
-    id: 1,
-    date: '2025-05-01',
-    type: 'Export',
-    kWh: 15.2,
-    rate: 0.34,
-    amount: 5.17,
-    status: 'completed',
-  },
-  {
-    id: 2,
-    date: '2025-04-30',
-    type: 'Export',
-    kWh: 18.5,
-    rate: 0.34,
-    amount: 6.29,
-    status: 'completed',
-  },
-  {
-    id: 3,
-    date: '2025-04-29',
-    type: 'Free to Grid',
-    kWh: 8.3,
-    rate: 0,
-    amount: 0,
-    status: 'completed',
-  },
+const monthlyExportData = [
+  { day: '1', kwh: 5.2 },
+  { day: '2', kwh: 6.1 },
+  { day: '3', kwh: 5.8 },
+  { day: '4', kwh: 7.2 },
+  { day: '5', kwh: 6.5 },
+  { day: '6', kwh: 8.1 },
+  { day: '7', kwh: 7.9 },
+  { day: '8', kwh: 6.3 },
+  { day: '9', kwh: 5.7 },
+  { day: '10', kwh: 7.4 },
 ];
 
 export default function ProsumerDashboard() {
   const { user, isAuthenticated } = useAuth();
-  const { currentGeneration, batteryLevel, startSimulation } = useEnergy();
+  const { currentGeneration } = useEnergy();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || user?.role !== 'prosumer') {
       setLocation('/login');
-    } else {
-      startSimulation();
     }
-  }, [isAuthenticated, setLocation, startSimulation]);
+  }, [isAuthenticated, user, setLocation]);
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated || !user || user.role !== 'prosumer') {
     return null;
   }
 
   const navItems = [
     { label: 'Overview', href: '/prosumer' },
-    { label: 'Energy Exports', href: '/prosumer/exports' },
-    { label: 'Earnings & Payouts', href: '/prosumer/earnings' },
-    { label: 'Solar Profile', href: '/prosumer/profile' },
-    { label: 'Settings', href: '/prosumer/settings' },
+    { label: 'Exports', href: '/prosumer/exports' },
+    { label: 'Earnings', href: '/prosumer/earnings' },
+    { label: 'Profile', href: '/prosumer/profile' },
   ];
 
-  const todayGeneration = 42.5;
-  const todayExported = 38.2;
-  const todayEarnings = 13.0;
+  const todayExport = 6.8;
+  const monthlyEarnings = (currentGeneration * 30 * 0.34).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
-          <p className="text-muted-foreground">
-            Your solar system is performing well today
-          </p>
+          <h1 className="text-3xl font-bold mb-2">Solar Dashboard</h1>
+          <p className="text-muted-foreground">Monitor your energy exports and earnings</p>
         </div>
 
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={Zap}
-            label="Generated Today"
-            value={todayGeneration}
-            unit="kWh"
-            color="green"
-          />
-          <StatCard
-            icon={TrendingUp}
-            label="Exported Today"
-            value={todayExported}
-            unit="kWh"
-            color="amber"
-          />
-          <StatCard
-            icon={Wallet}
-            label="Earnings Today"
-            value={todayEarnings.toFixed(2)}
-            unit="RM"
-            color="green"
-          />
-          <div className="card-soft p-6 flex flex-col items-center justify-center">
-            <EnergyMeter
-              value={batteryLevel * 10}
-              label="Battery Level"
-              color="blue"
-              size="sm"
-            />
-          </div>
-        </div>
-
-        {/* Status Panel and Charts */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Generation Chart */}
-          <div className="lg:col-span-2 card-soft p-6">
-            <h2 className="text-lg font-semibold mb-4">Today's Generation</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={generationData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="kWh" fill="#1D9E75" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Status Panel */}
-          <div className="card-soft p-6 space-y-4">
-            <h2 className="text-lg font-semibold">Status</h2>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm">
-                  <strong>Active</strong> - Exporting energy
-                </span>
+        {/* Key Metrics */}
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Today's Export */}
+          <div className="card-soft p-6 border-l-4 border-power-green">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Today's Export</p>
+                <p className="text-3xl font-bold text-power-green">{todayExport} kWh</p>
               </div>
-
-              <div className="pt-3 border-t border-border">
-                <p className="text-xs text-muted-foreground mb-1">Current Rate</p>
-                <p className="text-2xl font-bold text-power-green">34 sen/kWh</p>
-              </div>
-
-              <div className="pt-3 border-t border-border">
-                <p className="text-xs text-muted-foreground mb-2">Platform Inventory</p>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-amber-500 h-2 rounded-full"
-                    style={{ width: '65%' }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">65% Full</p>
-              </div>
-
-              <Button className="w-full bg-primary hover:bg-primary/90 mt-4">
-                View Exports
-              </Button>
+              <Sun className="w-8 h-8 text-power-green/50" />
             </div>
           </div>
+
+          {/* Monthly Earnings */}
+          <div className="card-soft p-6 border-l-4 border-power-amber">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">This Month's Earnings</p>
+                <p className="text-3xl font-bold text-power-amber">RM {monthlyEarnings}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-power-amber/50" />
+            </div>
+          </div>
+
+          {/* Wallet Balance */}
+          <div className="card-soft p-6 border-l-4 border-power-blue">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Wallet Balance</p>
+                <p className="text-3xl font-bold text-power-blue">RM {user.eWalletBalance.toFixed(2)}</p>
+              </div>
+              <Wallet className="w-8 h-8 text-power-blue/50" />
+            </div>
+            <Button variant="outline" size="sm" className="mt-4 w-full">
+              Withdraw
+            </Button>
+          </div>
         </div>
 
-        {/* Monthly Earnings Chart */}
+        {/* Export History Chart */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Monthly Earnings</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyData}>
+          <h2 className="text-lg font-semibold mb-4">Daily Export - Last 10 Days</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={monthlyExportData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="day" />
               <YAxis />
               <Tooltip />
-              <Legend />
               <Line
                 type="monotone"
-                dataKey="earnings"
+                dataKey="kwh"
                 stroke="#1D9E75"
                 strokeWidth={2}
                 dot={{ fill: '#1D9E75', r: 4 }}
-                activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-semibold">Date</th>
-                  <th className="text-left py-3 px-4 font-semibold">Type</th>
-                  <th className="text-right py-3 px-4 font-semibold">kWh</th>
-                  <th className="text-right py-3 px-4 font-semibold">Rate</th>
-                  <th className="text-right py-3 px-4 font-semibold">Amount</th>
-                  <th className="text-left py-3 px-4 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactionData.map((tx) => (
-                  <tr key={tx.id} className="border-b border-border hover:bg-secondary/50">
-                    <td className="py-3 px-4">{tx.date}</td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        variant={tx.type === 'Free to Grid' ? 'secondary' : 'default'}
-                      >
-                        {tx.type}
-                      </Badge>
-                    </td>
-                    <td className="text-right py-3 px-4">{tx.kWh}</td>
-                    <td className="text-right py-3 px-4">
-                      {tx.rate > 0 ? `${(tx.rate * 100).toFixed(0)} sen` : '—'}
-                    </td>
-                    <td className="text-right py-3 px-4 font-semibold">
-                      {tx.amount > 0 ? `RM ${tx.amount.toFixed(2)}` : '—'}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline">
-                        {tx.status === 'completed' ? '✓ Completed' : 'Pending'}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* System Info */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">System Information</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Capacity</span>
+                <span className="font-medium">{user.solarCapacityKwp} kWp</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Panel Count</span>
+                <span className="font-medium">{user.panelCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Monthly Limit</span>
+                <span className="font-medium">{user.monthlyExportLimitKwh} kWh</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Rate</span>
+                <span className="font-medium text-power-green">34 sen/kWh</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">Lifetime Stats</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Exported</span>
+                <span className="font-medium">{user.totalExportedKwh?.toLocaleString()} kWh</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Earnings</span>
+                <span className="font-medium text-power-green">RM {user.totalEarningsRM?.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Export Status</span>
+                <span className={`font-medium ${user.exportEnabled ? 'text-power-green' : 'text-red-500'}`}>
+                  {user.exportEnabled ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

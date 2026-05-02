@@ -46,19 +46,15 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register?role=prosumer">
-                  <a>
-                    <Button className="bg-primary hover:bg-primary/90 text-lg h-12 px-8">
-                      Join as Prosumer
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                  </a>
+                  <Button className="bg-primary hover:bg-primary/90 text-lg h-12 px-8">
+                    Join as Prosumer
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
                 </Link>
                 <Link href="/register?role=consumer">
-                  <a>
-                    <Button variant="outline" className="text-lg h-12 px-8">
-                      Subscribe as Consumer
-                    </Button>
-                  </a>
+                  <Button variant="outline" className="text-lg h-12 px-8">
+                    Subscribe as Consumer
+                  </Button>
                 </Link>
               </div>
             </div>
@@ -256,18 +252,14 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register?role=prosumer">
-              <a>
-                <Button className="bg-primary hover:bg-primary/90 text-lg h-12 px-8">
-                  Get Started as Prosumer
-                </Button>
-              </a>
+              <Button className="bg-primary hover:bg-primary/90 text-lg h-12 px-8">
+                Get Started as Prosumer
+              </Button>
             </Link>
             <Link href="/register?role=consumer">
-              <a>
-                <Button variant="outline" className="text-lg h-12 px-8">
-                  Browse Plans
-                </Button>
-              </a>
+              <Button variant="outline" className="text-lg h-12 px-8">
+                Browse Plans
+              </Button>
             </Link>
           </div>
         </div>

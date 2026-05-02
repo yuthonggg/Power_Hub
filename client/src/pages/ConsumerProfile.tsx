@@ -127,7 +127,7 @@ export default function ConsumerProfile() {
               <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
               <div className="flex items-center justify-between p-4 bg-power-green/10 rounded-lg">
                 <p className="text-2xl font-bold text-power-green">
-                  RM {user.walletBalance.toFixed(2)}
+                  RM {user.eWalletBalance.toFixed(2)}
                 </p>
                 <Button variant="outline" size="sm">
                   Top Up

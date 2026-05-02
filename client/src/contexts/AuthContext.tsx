@@ -1,27 +1,33 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 export type UserRole = 'prosumer' | 'consumer' | 'admin';
+export type ConsumerAccountType = 'shoplet' | 'high_usage_home' | 'ev_home' | 'office' | 'clinic' | 'cafe' | 'laundromat';
+export type SubscriptionPlan = 'Standard' | 'Plus' | 'Pro';
 
 export interface UserProfile {
   uid: string;
   email: string;
   name: string;
   role: UserRole;
-  walletBalance: number;
+  eWalletBalance: number; // RM
+  tNBAccountNumber?: string;
+  createdAt: number;
   
   // Prosumer-specific
   solarCapacityKwp?: number;
   panelCount?: number;
   installationDate?: string;
   postcode?: string;
-  isCapped?: boolean;
-  totalExportedKwh?: number;
-  totalEarningsRM?: number;
+  monthlyExportLimitKwh?: number; // set by admin
+  exportEnabled?: boolean;
+  totalExportedKwh?: number; // lifetime
+  totalEarningsRM?: number; // lifetime
   
   // Consumer-specific
-  accountType?: 'shoplet' | 'high_usage_home' | 'ev_home' | 'office' | 'clinic' | 'cafe' | 'laundromat';
+  accountType?: ConsumerAccountType;
   avgMonthlyUsageKwh?: number;
   activeSubscriptionId?: string | null;
+  activeSubscriptionPlan?: SubscriptionPlan | null;
 }
 
 interface AuthContextType {
@@ -40,25 +46,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Simulated login - in production, this would call Firebase
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Mock user data based on email
       const mockUser: UserProfile = {
         uid: 'user_' + Math.random().toString(36).substr(2, 9),
         email,
         name: email.split('@')[0],
         role: 'prosumer',
-        walletBalance: 250.50,
+        eWalletBalance: 250.50,
+        createdAt: Date.now(),
         solarCapacityKwp: 5.5,
         panelCount: 16,
         installationDate: '2023-06-15',
         postcode: '50000',
-        isCapped: false,
+        monthlyExportLimitKwh: 200,
+        exportEnabled: true,
         totalExportedKwh: 12450,
         totalEarningsRM: 4232.50,
       };
@@ -84,7 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         name: profileData.name || email.split('@')[0],
         role: profileData.role || 'consumer',
-        walletBalance: 0,
+        eWalletBalance: profileData.eWalletBalance || 0,
+        createdAt: Date.now(),
         ...profileData,
       };
       
@@ -108,7 +114,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Restore user from localStorage on mount
   React.useEffect(() => {
     const stored = localStorage.getItem('user');
     if (stored) {

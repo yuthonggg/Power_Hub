@@ -1,41 +1,23 @@
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import StatCard from '@/components/StatCard';
-import EnergyMeter from '@/components/EnergyMeter';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-import { Zap, TrendingDown, Leaf, AlertCircle } from 'lucide-react';
+import { Zap, TrendingDown, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const dailyUsageData = [
-  { day: 'Mon', solar: 18, grid: 5 },
-  { day: 'Tue', solar: 22, grid: 3 },
-  { day: 'Wed', solar: 20, grid: 4 },
-  { day: 'Thu', solar: 25, grid: 2 },
-  { day: 'Fri', solar: 19, grid: 6 },
-  { day: 'Sat', solar: 28, grid: 1 },
-  { day: 'Sun', solar: 24, grid: 3 },
-];
-
-const activityData = [
-  { date: '2025-05-01 14:30', kWh: 5.2, amount: 2.29 },
-  { date: '2025-05-01 10:15', kWh: 3.8, amount: 1.67 },
-  { date: '2025-04-30 18:45', kWh: 7.1, amount: 3.12 },
-  { date: '2025-04-30 12:20', kWh: 4.5, amount: 1.98 },
-  { date: '2025-04-29 20:00', kWh: 6.3, amount: 2.77 },
+const usageData = [
+  { day: '1', kwh: 28 },
+  { day: '2', kwh: 32 },
+  { day: '3', kwh: 25 },
+  { day: '4', kwh: 30 },
+  { day: '5', kwh: 35 },
+  { day: '6', kwh: 28 },
+  { day: '7', kwh: 33 },
+  { day: '8', kwh: 29 },
+  { day: '9', kwh: 31 },
+  { day: '10', kwh: 27 },
 ];
 
 export default function ConsumerDashboard() {
@@ -43,183 +25,152 @@ export default function ConsumerDashboard() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || user?.role !== 'consumer') {
       setLocation('/login');
     }
-  }, [isAuthenticated, setLocation]);
+  }, [isAuthenticated, user, setLocation]);
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated || !user || user.role !== 'consumer') {
     return null;
   }
 
   const navItems = [
     { label: 'Overview', href: '/consumer' },
-    { label: 'Subscription Plans', href: '/consumer/plans' },
-    { label: 'Usage History', href: '/consumer/usage' },
-    { label: 'Account Profile', href: '/consumer/profile' },
-    { label: 'Settings', href: '/consumer/settings' },
+    { label: 'Plans', href: '/consumer/plans' },
+    { label: 'Usage', href: '/consumer/usage' },
+    { label: 'Profile', href: '/consumer/profile' },
   ];
 
-  const creditsUsed = 485;
-  const creditsTotal = 700;
-  const creditsRemaining = creditsTotal - creditsUsed;
-  const usagePercent = (creditsUsed / creditsTotal) * 100;
-
-  const wattxCost = creditsUsed * 0.44;
-  const tnbCost = creditsUsed * 0.5068;
-  const savings = tnbCost - wattxCost;
+  const monthlyUsage = 300;
+  const monthlyRate = 44;
+  const monthlyCost = (monthlyUsage * monthlyRate / 100).toFixed(2);
+  const savings = ((monthlyUsage * 0.5068 - monthlyUsage * 0.44) * 100 / 100).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
-          <p className="text-muted-foreground">
-            You're on the Standard Plan - 700 kWh/month
-          </p>
+          <h1 className="text-3xl font-bold mb-2">Energy Dashboard</h1>
+          <p className="text-muted-foreground">Manage your solar subscription and usage</p>
         </div>
 
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={Zap}
-            label="Active Plan"
-            value="Standard"
-            unit="700 kWh/mo"
-            color="blue"
-          />
-          <StatCard
-            icon={TrendingDown}
-            label="Credits Remaining"
-            value={creditsRemaining}
-            unit="kWh"
-            color="green"
-          />
-          <StatCard
-            icon={Leaf}
-            label="Savings This Month"
-            value={savings.toFixed(2)}
-            unit="RM"
-            color="amber"
-          />
-          <StatCard
-            label="CO₂ Avoided"
-            value={(creditsUsed * 0.585).toFixed(0)}
-            unit="kg"
-            color="green"
-          />
-        </div>
-
-        {/* Credit Usage Bar */}
-        <div className="card-soft p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Monthly Credit Usage</h2>
-            <span className="text-sm text-muted-foreground">
-              {creditsUsed} / {creditsTotal} kWh
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  usagePercent < 70
-                    ? 'bg-green-500'
-                    : usagePercent < 90
-                    ? 'bg-amber-500'
-                    : 'bg-red-500'
-                }`}
-                style={{ width: `${Math.min(usagePercent, 100)}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {((creditsTotal - creditsUsed) / creditsTotal * 100).toFixed(0)}% remaining
-            </p>
-          </div>
-        </div>
-
-        {/* Bill Comparison and Usage Chart */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Bill Comparison */}
-          <div className="card-soft p-6">
-            <h2 className="text-lg font-semibold mb-6">Bill Comparison</h2>
-            <div className="space-y-4">
+        {/* Key Metrics */}
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Current Usage */}
+          <div className="card-soft p-6 border-l-4 border-power-blue">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Power Hub Cost</p>
-                <p className="text-2xl font-bold text-power-blue">
-                  RM {wattxCost.toFixed(2)}
-                </p>
+                <p className="text-sm text-muted-foreground mb-1">This Month's Usage</p>
+                <p className="text-3xl font-bold text-power-blue">{monthlyUsage} kWh</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">TNB Estimated Cost</p>
-                <p className="text-2xl font-bold text-gray-400">
-                  RM {tnbCost.toFixed(2)}
-                </p>
-              </div>
-              <div className="pt-4 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-1">Your Savings</p>
-                <p className="text-3xl font-bold text-green-600">
-                  RM {savings.toFixed(2)}
-                </p>
-              </div>
+              <Zap className="w-8 h-8 text-power-blue/50" />
             </div>
           </div>
 
-          {/* Daily Usage Chart */}
-          <div className="card-soft p-6">
-            <h2 className="text-lg font-semibold mb-4">Daily Credit Usage - Last 7 Days</h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={dailyUsageData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="solar" fill="#1D9E75" name="Solar Credits" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="grid" fill="#9CA3AF" name="Grid" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-          <div className="space-y-3">
-            {activityData.map((activity, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-3 hover:bg-secondary/50 rounded-lg transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="w-5 h-5 text-power-blue" />
-                  <div>
-                    <p className="font-medium">{activity.kWh} kWh used</p>
-                    <p className="text-xs text-muted-foreground">{activity.date}</p>
-                  </div>
-                </div>
-                <p className="font-semibold text-power-blue">
-                  -RM {activity.amount.toFixed(2)}
-                </p>
+          {/* Monthly Cost */}
+          <div className="card-soft p-6 border-l-4 border-power-green">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Monthly Cost</p>
+                <p className="text-3xl font-bold text-power-green">RM {monthlyCost}</p>
               </div>
-            ))}
+              <TrendingDown className="w-8 h-8 text-power-green/50" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">at 44 sen/kWh</p>
+          </div>
+
+          {/* Monthly Savings */}
+          <div className="card-soft p-6 border-l-4 border-power-amber">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
+                <p className="text-3xl font-bold text-power-amber">RM {savings}</p>
+              </div>
+              <Leaf className="w-8 h-8 text-power-amber/50" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">vs TNB rate</p>
           </div>
         </div>
 
-        {/* Upgrade CTA */}
-        <div className="card-soft p-6 bg-gradient-to-r from-power-blue/10 to-power-green/10 border-2 border-power-blue/20">
-          <div className="flex items-start justify-between">
+        {/* Subscription Status */}
+        <div className="card-soft p-6">
+          <h2 className="text-lg font-semibold mb-4">Active Subscription</h2>
+          <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Want More Credits?</h3>
-              <p className="text-muted-foreground mb-4">
-                Upgrade to the Premium Plan for 1,500 kWh/month and save even more.
-              </p>
-              <Button className="bg-power-blue hover:bg-power-blue/90">
-                View Premium Plan
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Plan</p>
+                  <p className="text-xl font-semibold">{user.activeSubscriptionPlan || 'Plus'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Monthly Allocation</p>
+                  <p className="text-xl font-semibold text-power-green">{monthlyUsage} kWh</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Rate</p>
+                  <p className="text-xl font-semibold">{monthlyRate} sen/kWh</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Status</p>
+                <Badge className="bg-power-green text-white">Active</Badge>
+              </div>
+              <Button variant="outline" className="w-full">
+                Manage Subscription
               </Button>
             </div>
-            <AlertCircle className="w-6 h-6 text-power-blue flex-shrink-0" />
+          </div>
+        </div>
+
+        {/* Usage History Chart */}
+        <div className="card-soft p-6">
+          <h2 className="text-lg font-semibold mb-4">Daily Usage - Last 10 Days</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={usageData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="kwh"
+                stroke="#378ADD"
+                strokeWidth={2}
+                dot={{ fill: '#378ADD', r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Wallet & Payment */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">Wallet</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Balance</p>
+                <p className="text-2xl font-bold text-power-blue">RM {user.eWalletBalance.toFixed(2)}</p>
+              </div>
+              <Button className="w-full bg-power-blue hover:bg-power-blue/90">
+                Top Up
+              </Button>
+            </div>
+          </div>
+
+          <div className="card-soft p-6">
+            <h3 className="font-semibold mb-3">Next Payment</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Due Amount</p>
+                <p className="text-2xl font-bold text-power-green">RM {monthlyCost}</p>
+              </div>
+              <Button className="w-full bg-power-green hover:bg-power-green/90">
+                Pay Now
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -238,7 +238,7 @@ export default function ConsumerPlans() {
 
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm">
-                        <strong>Wallet Balance:</strong> RM {user.walletBalance.toFixed(2)}
+                        <strong>Wallet Balance:</strong> RM {user.eWalletBalance.toFixed(2)}
                       </p>
                     </div>
 
