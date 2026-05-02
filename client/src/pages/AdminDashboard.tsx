@@ -40,9 +40,9 @@ export default function AdminDashboard() {
 
   const navItems = [
     { label: 'Overview', href: '/admin' },
-    { label: 'Pricing', href: '/admin/pricing' },
-    { label: 'Users', href: '/admin/users' },
-    { label: 'Inventory', href: '/admin/inventory' },
+    { label: 'Pricing Control', href: '/admin/pricing' },
+    { label: 'User Management', href: '/admin/users' },
+    { label: 'Inventory Management', href: '/admin/inventory' },
   ];
 
   // Revenue calculations
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
@@ -108,17 +108,6 @@ export default function AdminDashboard() {
               <TrendingUp className="w-8 h-8 text-power-amber/50" />
             </div>
             <p className="text-xs text-muted-foreground mt-2">per kWh (range: 42–46)</p>
-          </div>
-
-          <div className="card-soft p-6 border-l-4 border-purple-500">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Energy Pool</p>
-                <p className="text-3xl font-bold text-purple-600">{platformInventory.toFixed(0)}%</p>
-              </div>
-              <AlertCircle className="w-8 h-8 text-purple-500/50" />
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">subscribed</p>
           </div>
         </div>
 
@@ -250,12 +239,12 @@ export default function AdminDashboard() {
             </Button>
           </div>
 
-          <div className="card-soft p-6">
+          <div className="card-soft p-6 flex flex-col">
             <h3 className="font-semibold mb-4">Energy Pool</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Monitor solar pool capacity and subscription limits
+              Monitor solar pool capacity and subscription limits to ensure platform stability
             </p>
-            <Button className="w-full bg-power-green hover:bg-power-green/90" onClick={() => setLocation('/admin/inventory')}>
+            <Button className="w-full bg-power-green hover:bg-power-green/90 mt-auto" onClick={() => setLocation('/admin/inventory')}>
               Manage Pool
             </Button>
           </div>

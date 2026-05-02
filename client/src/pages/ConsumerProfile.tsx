@@ -147,6 +147,11 @@ export default function ConsumerProfile() {
               <p className="text-sm text-muted-foreground mb-2">Billing Email</p>
               <p className="font-medium">{user.email}</p>
             </div>
+
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Service Address</p>
+              <p className="font-medium">{user.address || 'Address not provided'}</p>
+            </div>
           </div>
         </div>
 

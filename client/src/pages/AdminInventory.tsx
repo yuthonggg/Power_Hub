@@ -102,8 +102,7 @@ export default function AdminInventory() {
     { label: 'Overview', href: '/admin' },
     { label: 'Pricing Control', href: '/admin/pricing' },
     { label: 'User Management', href: '/admin/users' },
-    { label: 'Inventory Manager', href: '/admin/inventory' },
-    { label: 'Reports', href: '/admin/reports' },
+    { label: 'Inventory Management', href: '/admin/inventory' },
   ];
 
   const handleSaveSettings = () => {
@@ -220,44 +219,6 @@ export default function AdminInventory() {
           </ResponsiveContainer>
         </div>
 
-        {/* Surplus Log */}
-        <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Surplus Log</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-semibold">Date</th>
-                  <th className="text-right py-3 px-4 font-semibold">Surplus kWh</th>
-                  <th className="text-left py-3 px-4 font-semibold">Action</th>
-                  <th className="text-right py-3 px-4 font-semibold">Prosumers Capped</th>
-                </tr>
-              </thead>
-              <tbody>
-                {surplusLogData.map((log, idx) => (
-                  <tr key={idx} className="border-b border-border hover:bg-secondary/50">
-                    <td className="py-3 px-4">{log.date}</td>
-                    <td className="text-right py-3 px-4 font-semibold">{log.surplus}</td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        variant={log.action === 'Free to Grid' ? 'secondary' : 'outline'}
-                      >
-                        {log.action}
-                      </Badge>
-                    </td>
-                    <td className="text-right py-3 px-4">
-                      {log.prosumersCapped > 0 ? (
-                        <Badge className="bg-red-100 text-red-800">{log.prosumersCapped}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );

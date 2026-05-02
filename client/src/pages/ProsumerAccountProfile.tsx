@@ -7,11 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 export default function ProsumerAccountProfile() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [copied, setCopied] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -63,14 +74,80 @@ export default function ProsumerAccountProfile() {
                   RM {user.eWalletBalance.toFixed(2)}
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Deposit
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Withdraw
-                  </Button>
+                  <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Deposit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Deposit to Wallet</DialogTitle>
+                        <DialogDescription>Add funds to your Power Hub wallet</DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+                          <Label className="text-xs text-muted-foreground mb-1 block">Home Address Confirmation</Label>
+                          <p className="font-medium text-sm">{user.address || 'Address not provided'}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Please ensure your address is correct.</p>
+                        </div>
+                        <div>
+                          <Label>Current Balance</Label>
+                          <p className="text-2xl font-bold text-power-green mt-1">RM {user.eWalletBalance.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="deposit-amt">Deposit Amount (RM)</Label>
+                          <Input id="deposit-amt" type="number" placeholder="Minimum RM 10.00" min="10" className="mt-1" />
+                        </div>
+                        <Button className="w-full bg-power-green hover:bg-power-green/90">Confirm Deposit</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Withdraw
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Withdraw from Wallet</DialogTitle>
+                        <DialogDescription>Transfer earnings to your bank account</DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+                          <Label className="text-xs text-muted-foreground mb-1 block">Home Address Confirmation</Label>
+                          <p className="font-medium text-sm">{user.address || 'Address not provided'}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Please ensure your address is correct.</p>
+                        </div>
+                        <div>
+                          <Label>Available Balance</Label>
+                          <p className="text-2xl font-bold text-power-green mt-1">RM {user.eWalletBalance.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="withdraw-amt">Withdraw Amount (RM)</Label>
+                          <Input id="withdraw-amt" type="number" placeholder="Minimum RM 10.00" min="10" className="mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="bank-name">Bank Name</Label>
+                          <Input id="bank-name" placeholder="e.g., Maybank, CIMB" className="mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="acc-no">Account Number</Label>
+                          <Input id="acc-no" placeholder="Your bank account number" className="mt-1" />
+                        </div>
+                        <Button className="w-full bg-power-green hover:bg-power-green/90">Confirm Withdrawal</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
+            </div>
+
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Service Address</p>
+              <p className="font-medium">{user.address || 'Address not provided'}</p>
             </div>
 
             <div>

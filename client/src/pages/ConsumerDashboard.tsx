@@ -278,6 +278,12 @@ export default function ConsumerDashboard() {
                     <p className="text-2xl font-bold text-power-blue">RM {totalCost.toFixed(2)}</p>
                   </div>
 
+                  <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+                    <Label className="text-xs text-muted-foreground mb-1 block">Service Address Confirmation</Label>
+                    <p className="font-medium text-sm">{user.address || 'Address not provided'}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Please ensure your address is correct before proceeding.</p>
+                  </div>
+
                   <div>
                     <Label className="mb-2 block">Select Payment Method</Label>
                     <div className="space-y-2">

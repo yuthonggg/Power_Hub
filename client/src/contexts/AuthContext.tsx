@@ -11,6 +11,7 @@ export interface UserProfile {
   role: UserRole;
   eWalletBalance: number; // RM
   tNBAccountNumber?: string;
+  address?: string;
   createdAt: number;
   
   // Prosumer-specific
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: email.split('@')[0],
         role: 'prosumer',
         eWalletBalance: 250.50,
+        address: '123 Jalan Ampang, 50450 Kuala Lumpur',
         createdAt: Date.now(),
         solarCapacityKwp: 5.5,
         panelCount: 16,
@@ -90,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: profileData.name || email.split('@')[0],
         role: profileData.role || 'consumer',
         eWalletBalance: profileData.eWalletBalance || 0,
+        address: profileData.address || '123 Jalan Ampang, 50450 Kuala Lumpur',
         createdAt: Date.now(),
         ...profileData,
       };

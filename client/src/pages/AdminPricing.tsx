@@ -48,8 +48,7 @@ export default function AdminPricing() {
     { label: 'Overview', href: '/admin' },
     { label: 'Pricing Control', href: '/admin/pricing' },
     { label: 'User Management', href: '/admin/users' },
-    { label: 'Inventory Manager', href: '/admin/inventory' },
-    { label: 'Reports', href: '/admin/reports' },
+    { label: 'Inventory Management', href: '/admin/inventory' },
   ];
 
   const margin = (sellRate - buyRate).toFixed(2);
