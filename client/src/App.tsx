@@ -12,7 +12,6 @@ import Register from "./pages/Register";
 
 // Prosumer pages
 import ProsumerDashboard from "./pages/ProsumerDashboard";
-import ProsumerExports from "./pages/ProsumerExports";
 import ProsumerEarnings from "./pages/ProsumerEarnings";
 import ProsumerProfile from "./pages/ProsumerProfile";
 
@@ -42,7 +41,7 @@ function Router() {
 
       {/* Prosumer pages */}
       <Route path={"/prosumer"} component={ProsumerDashboard} />
-      <Route path={"/prosumer/exports"} component={ProsumerExports} />
+      <Route path={"/prosumer/exports"} component={ProsumerDashboard} />
       <Route path={"/prosumer/earnings"} component={ProsumerEarnings} />
       <Route path={"/prosumer/profile"} component={ProsumerProfile} />
 

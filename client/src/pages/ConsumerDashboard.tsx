@@ -2,10 +2,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
-import { useEffect } from 'react';
-import { Zap, TrendingDown, Leaf, Activity } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Zap, TrendingDown, Leaf, Activity, Wallet, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const usageData = [
@@ -25,6 +35,8 @@ export default function ConsumerDashboard() {
   const { user, isAuthenticated } = useAuth();
   const { currentConsumption, startSimulation, lastUpdateTime } = useEnergy();
   const [, setLocation] = useLocation();
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'consumer') {
@@ -41,15 +53,30 @@ export default function ConsumerDashboard() {
   const navItems = [
     { label: 'Overview', href: '/consumer' },
     { label: 'Plans', href: '/consumer/plans' },
-    { label: 'Usage', href: '/consumer/usage' },
+    { label: 'Billing', href: '/consumer/usage' },
     { label: 'Profile', href: '/consumer/profile' },
   ];
 
-  const monthlyUsage = 300;
-  const monthlyRate = 44;
-  const monthlyCost = (monthlyUsage * monthlyRate / 100).toFixed(2);
-  const savings = ((monthlyUsage * 0.5068 - monthlyUsage * 0.44) * 100 / 100).toFixed(2);
-  const currentCost = (currentConsumption * monthlyRate / 100).toFixed(2);
+  // Subscription plan mapping
+  const planKwh = user.activeSubscriptionPlan === 'Pro' ? 500
+    : user.activeSubscriptionPlan === 'Plus' ? 300
+    : 100; // Standard
+
+  const monthlyRate = 44; // sen/kWh
+  const totalUsage = 850; // example total monthly usage
+  const solarAllocation = Math.min(totalUsage, planKwh);
+  const tnbUsage = totalUsage - solarAllocation;
+
+  const solarCost = solarAllocation * monthlyRate / 100;
+  const tnbRate = user.accountType === 'shoplet' || user.accountType === 'cafe' || user.accountType === 'laundromat' || user.accountType === 'office' || user.accountType === 'clinic'
+    ? 50.68
+    : 54.43; // high-usage domestic
+  const tnbCost = tnbUsage * tnbRate / 100;
+  const totalCost = solarCost + tnbCost;
+
+  // What it would cost fully on TNB
+  const fullTnbCost = totalUsage * tnbRate / 100;
+  const savings = (fullTnbCost - totalCost).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -67,7 +94,7 @@ export default function ConsumerDashboard() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-4 gap-4">
           {/* Current Usage */}
           <div className="card-soft p-6 border-l-4 border-power-blue">
             <div className="flex items-start justify-between">
@@ -80,66 +107,162 @@ export default function ConsumerDashboard() {
             </div>
           </div>
 
-          {/* Current Cost */}
+          {/* Monthly Savings */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Current Cost</p>
-                <p className="text-3xl font-bold text-power-green">RM {currentCost}</p>
+                <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
+                <p className="text-3xl font-bold text-power-green">RM {savings}</p>
               </div>
-              <TrendingDown className="w-8 h-8 text-power-green/50" />
+              <Leaf className="w-8 h-8 text-power-green/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">per hour</p>
+            <p className="text-xs text-muted-foreground mt-2">vs fully on TNB</p>
           </div>
 
-          {/* Monthly Savings */}
+          {/* Subscription */}
           <div className="card-soft p-6 border-l-4 border-power-amber">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
-                <p className="text-3xl font-bold text-power-amber">RM {savings}</p>
+                <p className="text-sm text-muted-foreground mb-1">Plan</p>
+                <p className="text-3xl font-bold text-power-amber">{user.activeSubscriptionPlan || 'Plus'}</p>
               </div>
-              <Leaf className="w-8 h-8 text-power-amber/50" />
+              <TrendingDown className="w-8 h-8 text-power-amber/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">vs TNB rate</p>
+            <p className="text-xs text-muted-foreground mt-2">{planKwh} kWh/month at 44 sen</p>
+          </div>
+
+          {/* Wallet Balance */}
+          <div className="card-soft p-6 border-l-4 border-emerald-500">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Wallet Balance</p>
+                <p className="text-3xl font-bold text-emerald-600">RM {user.eWalletBalance.toFixed(2)}</p>
+              </div>
+              <Wallet className="w-8 h-8 text-emerald-500/50" />
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex-1 gap-1">
+                    <ArrowDownLeft className="w-3 h-3" /> Deposit
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Deposit to Wallet</DialogTitle>
+                    <DialogDescription>Add funds to your Power Hub wallet</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Current Balance</Label>
+                      <p className="text-2xl font-bold text-power-green mt-1">RM {user.eWalletBalance.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="deposit-amt">Deposit Amount (RM)</Label>
+                      <Input id="deposit-amt" type="number" placeholder="Minimum RM 10.00" min="10" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label>Payment Method</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Button variant="outline" size="sm">FPX</Button>
+                        <Button variant="outline" size="sm">Credit Card</Button>
+                      </div>
+                    </div>
+                    <Button className="w-full bg-power-green hover:bg-power-green/90">Confirm Deposit</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex-1 gap-1">
+                    <ArrowUpRight className="w-3 h-3" /> Withdraw
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Withdraw from Wallet</DialogTitle>
+                    <DialogDescription>Transfer funds to your bank account</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Available Balance</Label>
+                      <p className="text-2xl font-bold text-power-green mt-1">RM {user.eWalletBalance.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="withdraw-amt">Withdraw Amount (RM)</Label>
+                      <Input id="withdraw-amt" type="number" placeholder="Minimum RM 10.00" min="10" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label htmlFor="bank-name">Bank Name</Label>
+                      <Input id="bank-name" placeholder="e.g., Maybank, CIMB" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label htmlFor="acc-no">Account Number</Label>
+                      <Input id="acc-no" placeholder="Your bank account number" className="mt-1" />
+                    </div>
+                    <Button className="w-full bg-power-green hover:bg-power-green/90">Confirm Withdrawal</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
-        {/* Subscription Status */}
+        {/* Monthly Bill Preview — Split Bill */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Active Subscription</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Plan</p>
-                  <p className="text-xl font-semibold">{user.activeSubscriptionPlan || 'Plus'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Monthly Allocation</p>
-                  <p className="text-xl font-semibold text-power-green">{monthlyUsage} kWh</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Rate</p>
-                  <p className="text-xl font-semibold">{monthlyRate} sen/kWh</p>
-                </div>
-              </div>
+          <h2 className="text-lg font-semibold mb-4">Monthly Bill Preview — Split Billing</h2>
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-power-green/10 rounded-lg border border-power-green/20">
+              <p className="text-xs text-muted-foreground mb-1">Power Hub Portion</p>
+              <p className="text-2xl font-bold text-power-green">RM {solarCost.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{solarAllocation} kWh × 44 sen</p>
             </div>
-            <div className="flex flex-col justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Status</p>
-                <Badge className="bg-power-green text-white">Active</Badge>
-              </div>
-              <Button variant="outline" className="w-full">
-                Manage Subscription
-              </Button>
+            <div className="p-4 bg-gray-100 rounded-lg border border-gray-200">
+              <p className="text-xs text-muted-foreground mb-1">TNB Portion</p>
+              <p className="text-2xl font-bold text-gray-700">RM {tnbCost.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{tnbUsage} kWh × {tnbRate.toFixed(2)} sen</p>
             </div>
+            <div className="p-4 bg-power-blue/10 rounded-lg border border-power-blue/20">
+              <p className="text-xs text-muted-foreground mb-1">Total Bill</p>
+              <p className="text-2xl font-bold text-power-blue">RM {totalCost.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{totalUsage} kWh total usage</p>
+            </div>
+          </div>
+
+          {/* Bill Breakdown */}
+          <div className="space-y-2 text-sm border-t border-border pt-4">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total Electricity Used</span>
+              <span className="font-medium">{totalUsage} kWh</span>
+            </div>
+            <div className="flex justify-between text-power-green">
+              <span>Solar Allocation (Power Hub)</span>
+              <span className="font-medium">−{solarAllocation} kWh</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2">
+              <span className="text-muted-foreground">Remaining Grid Usage (TNB)</span>
+              <span className="font-medium">{tnbUsage} kWh</span>
+            </div>
+            <div className="flex justify-between pt-2">
+              <span className="text-muted-foreground">If fully on TNB</span>
+              <span className="font-medium line-through text-red-400">RM {fullTnbCost.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-power-green font-semibold">
+              <span>You Save</span>
+              <span>RM {savings}</span>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-xs text-muted-foreground">
+              💡 Your bill is automatically split between Power Hub and TNB. The Power Hub portion is deducted from your e-wallet. The TNB portion is paid through integrated TNB payment.
+            </p>
           </div>
         </div>
 
         {/* Usage History Chart */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Daily Usage - Last 10 Days</h2>
+          <h2 className="text-lg font-semibold mb-4">Daily Usage — Last 10 Days</h2>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={usageData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -157,30 +280,31 @@ export default function ConsumerDashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Wallet & Payment */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="card-soft p-6">
-            <h3 className="font-semibold mb-3">Wallet</h3>
+        {/* Subscription Status */}
+        <div className="card-soft p-6">
+          <h2 className="text-lg font-semibold mb-4">Active Subscription</h2>
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Balance</p>
-                <p className="text-2xl font-bold text-power-blue">RM {user.eWalletBalance.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground mb-1">Plan</p>
+                <p className="text-xl font-semibold">{user.activeSubscriptionPlan || 'Plus'}</p>
               </div>
-              <Button className="w-full bg-power-blue hover:bg-power-blue/90">
-                Top Up
-              </Button>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Monthly Solar Allocation</p>
+                <p className="text-xl font-semibold text-power-green">{planKwh} kWh</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Rate</p>
+                <p className="text-xl font-semibold">{monthlyRate} sen/kWh</p>
+              </div>
             </div>
-          </div>
-
-          <div className="card-soft p-6">
-            <h3 className="font-semibold mb-3">Next Payment</h3>
-            <div className="space-y-3">
+            <div className="flex flex-col justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Due Amount</p>
-                <p className="text-2xl font-bold text-power-green">RM {monthlyCost}</p>
+                <p className="text-sm text-muted-foreground mb-2">Status</p>
+                <Badge className="bg-power-green text-white">Active</Badge>
               </div>
-              <Button className="w-full bg-power-green hover:bg-power-green/90">
-                Pay Now
+              <Button variant="outline" className="w-full" onClick={() => setLocation('/consumer/plans')}>
+                Change Plan
               </Button>
             </div>
           </div>

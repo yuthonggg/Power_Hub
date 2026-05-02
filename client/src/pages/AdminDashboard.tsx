@@ -3,10 +3,10 @@ import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Users, Zap, TrendingUp, AlertCircle, Activity } from 'lucide-react';
+import { Users, Zap, TrendingUp, AlertCircle, Activity, Wallet, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const supplyDemandData = [
   { day: '1', supply: 245, demand: 218 },
@@ -45,13 +45,28 @@ export default function AdminDashboard() {
     { label: 'Inventory', href: '/admin/inventory' },
   ];
 
+  // Revenue calculations
+  const totalEnergyTraded = 2850; // kWh this month
+  const consumerRate = 44; // sen/kWh (what consumers pay)
+  const prosumerRate = 34; // sen/kWh (what prosumers receive)
+  const platformMargin = consumerRate - prosumerRate; // 10 sen/kWh
+
+  const totalConsumerRevenue = totalEnergyTraded * consumerRate / 100;
+  const totalProsumerPayout = totalEnergyTraded * prosumerRate / 100;
+  const platformProfit = totalEnergyTraded * platformMargin / 100;
+
+  // TNB split billing data
+  const totalConsumerUsage = 8500; // total kWh consumed by all consumers
+  const solarAllocated = totalEnergyTraded; // kWh allocated from solar
+  const tnbUsage = totalConsumerUsage - solarAllocated; // remaining on TNB
+
   return (
     <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold mb-2">Platform Overview</h1>
-          <p className="text-muted-foreground">Monitor platform health and key metrics</p>
+          <p className="text-muted-foreground">Monitor platform health, revenue, and TNB partnership billing</p>
         </div>
 
         {/* Live Status */}
@@ -62,7 +77,6 @@ export default function AdminDashboard() {
 
         {/* Key Metrics */}
         <div className="grid md:grid-cols-4 gap-4">
-          {/* Total Prosumers */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
@@ -74,7 +88,6 @@ export default function AdminDashboard() {
             <p className="text-xs text-muted-foreground mt-2">+12 this month</p>
           </div>
 
-          {/* Total Consumers */}
           <div className="card-soft p-6 border-l-4 border-power-blue">
             <div className="flex items-start justify-between">
               <div>
@@ -86,7 +99,6 @@ export default function AdminDashboard() {
             <p className="text-xs text-muted-foreground mt-2">+28 this month</p>
           </div>
 
-          {/* Current Rate */}
           <div className="card-soft p-6 border-l-4 border-power-amber">
             <div className="flex items-start justify-between">
               <div>
@@ -95,44 +107,122 @@ export default function AdminDashboard() {
               </div>
               <TrendingUp className="w-8 h-8 text-power-amber/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">per kWh</p>
+            <p className="text-xs text-muted-foreground mt-2">per kWh (range: 42–46)</p>
           </div>
 
-          {/* Live Inventory Status */}
-          <div className="card-soft p-6 border-l-4 border-power-purple">
+          <div className="card-soft p-6 border-l-4 border-purple-500">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Inventory</p>
-                <p className="text-3xl font-bold text-power-purple">{platformInventory.toFixed(0)}%</p>
+                <p className="text-sm text-muted-foreground mb-1">Energy Pool</p>
+                <p className="text-3xl font-bold text-purple-600">{platformInventory.toFixed(0)}%</p>
               </div>
-              <AlertCircle className="w-8 h-8 text-power-purple/50" />
+              <AlertCircle className="w-8 h-8 text-purple-500/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Real-time</p>
+            <p className="text-xs text-muted-foreground mt-2">subscribed</p>
+          </div>
+        </div>
+
+        {/* Revenue Split — Platform Economics */}
+        <div className="card-soft p-6">
+          <h2 className="text-lg font-semibold mb-4">Monthly Revenue Split</h2>
+          <div className="grid md:grid-cols-4 gap-4 mb-4">
+            <div className="p-4 bg-power-blue/10 rounded-lg border border-power-blue/20">
+              <p className="text-xs text-muted-foreground mb-1">Consumer Payments</p>
+              <p className="text-2xl font-bold text-power-blue">RM {totalConsumerRevenue.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{totalEnergyTraded} kWh × 44 sen</p>
+            </div>
+            <div className="p-4 bg-power-green/10 rounded-lg border border-power-green/20">
+              <p className="text-xs text-muted-foreground mb-1">Prosumer Earnings</p>
+              <p className="text-2xl font-bold text-power-green">RM {totalProsumerPayout.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{totalEnergyTraded} kWh × 34 sen</p>
+            </div>
+            <div className="p-4 bg-power-amber/10 rounded-lg border border-power-amber/20">
+              <p className="text-xs text-muted-foreground mb-1">Platform Margin</p>
+              <p className="text-2xl font-bold text-power-amber">RM {platformProfit.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{totalEnergyTraded} kWh × 10 sen</p>
+            </div>
+            <div className="p-4 bg-gray-100 rounded-lg border border-gray-200">
+              <p className="text-xs text-muted-foreground mb-1">CO₂ Avoided</p>
+              <p className="text-2xl font-bold text-gray-700">{(totalEnergyTraded * 0.585).toFixed(0)} kg</p>
+              <p className="text-xs text-muted-foreground mt-1">0.585 kg/kWh factor</p>
+            </div>
+          </div>
+
+          {/* Margin Breakdown */}
+          <div className="space-y-2 text-sm border-t border-border pt-4">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Consumer pays</span>
+              <span className="font-medium">44 sen/kWh</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Prosumer receives</span>
+              <span className="font-medium text-power-green">34 sen/kWh</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2 font-semibold">
+              <span>Platform margin</span>
+              <span className="text-power-amber">10 sen/kWh</span>
+            </div>
+          </div>
+        </div>
+
+        {/* TNB Partnership — Billing Split */}
+        <div className="card-soft p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 className="w-5 h-5 text-power-blue" />
+            <h2 className="text-lg font-semibold">TNB Partnership — Billing Split</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Consumer bills are split between Power Hub and TNB. This section tracks the total energy allocation and payment flow.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-4">
+            <div className="p-4 bg-power-green/10 rounded-lg border border-power-green/20">
+              <p className="text-xs text-muted-foreground mb-1">Power Hub Portion</p>
+              <p className="text-2xl font-bold text-power-green">{solarAllocated.toLocaleString()} kWh</p>
+              <p className="text-xs text-muted-foreground mt-1">RM {(solarAllocated * 0.44).toFixed(2)} billed</p>
+            </div>
+            <div className="p-4 bg-gray-100 rounded-lg border border-gray-200">
+              <p className="text-xs text-muted-foreground mb-1">TNB Grid Portion</p>
+              <p className="text-2xl font-bold text-gray-700">{tnbUsage.toLocaleString()} kWh</p>
+              <p className="text-xs text-muted-foreground mt-1">Billed by TNB directly</p>
+            </div>
+            <div className="p-4 bg-power-blue/10 rounded-lg border border-power-blue/20">
+              <p className="text-xs text-muted-foreground mb-1">Total Consumer Usage</p>
+              <p className="text-2xl font-bold text-power-blue">{totalConsumerUsage.toLocaleString()} kWh</p>
+              <p className="text-xs text-muted-foreground mt-1">{((solarAllocated / totalConsumerUsage) * 100).toFixed(1)}% from solar</p>
+            </div>
+          </div>
+
+          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-xs text-muted-foreground">
+              💡 <strong>TNB Partnership:</strong> Consumer payments are automatically split — Power Hub deducts the solar portion from consumer wallets, while the remaining grid usage is processed through TNB's integrated payment gateway. Revenue reconciliation happens monthly.
+            </p>
           </div>
         </div>
 
         {/* Supply vs Demand */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Supply vs Demand - Last 10 Days</h2>
+          <h2 className="text-lg font-semibold mb-4">Supply vs Demand — Last 10 Days</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={supplyDemandData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="day" />
               <YAxis />
               <Tooltip />
+              <Legend />
               <Line
                 type="monotone"
                 dataKey="supply"
                 stroke="#1D9E75"
                 strokeWidth={2}
-                name="Prosumer Supply (kWh/h)"
+                name="Prosumer Supply (kWh/day)"
               />
               <Line
                 type="monotone"
                 dataKey="demand"
                 stroke="#378ADD"
                 strokeWidth={2}
-                name="Consumer Demand (kWh/h)"
+                name="Consumer Demand (kWh/day)"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -143,9 +233,9 @@ export default function AdminDashboard() {
           <div className="card-soft p-6">
             <h3 className="font-semibold mb-4">Pricing Control</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Adjust monthly rates and review pricing formula
+              Adjust monthly rates using the formula: P = 44 + 2 × ((D−S)/D)
             </p>
-            <Button className="w-full bg-power-amber hover:bg-power-amber/90">
+            <Button className="w-full bg-power-amber hover:bg-power-amber/90" onClick={() => setLocation('/admin/pricing')}>
               Manage Pricing
             </Button>
           </div>
@@ -153,44 +243,47 @@ export default function AdminDashboard() {
           <div className="card-soft p-6">
             <h3 className="font-semibold mb-4">User Management</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Review users, verify accounts, and manage access
+              Review users, verify accounts, and set prosumer export limits
             </p>
-            <Button className="w-full bg-power-blue hover:bg-power-blue/90">
+            <Button className="w-full bg-power-blue hover:bg-power-blue/90" onClick={() => setLocation('/admin/users')}>
               Manage Users
             </Button>
           </div>
 
           <div className="card-soft p-6">
-            <h3 className="font-semibold mb-4">Inventory Manager</h3>
+            <h3 className="font-semibold mb-4">Energy Pool</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Monitor energy pool and set export limits
+              Monitor solar pool capacity and subscription limits
             </p>
-            <Button className="w-full bg-power-green hover:bg-power-green/90">
-              Manage Inventory
+            <Button className="w-full bg-power-green hover:bg-power-green/90" onClick={() => setLocation('/admin/inventory')}>
+              Manage Pool
             </Button>
           </div>
         </div>
 
-        {/* Platform Stats */}
+        {/* Wallet Overview */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="card-soft p-6">
-            <h3 className="font-semibold mb-3">Monthly Metrics</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet className="w-5 h-5 text-power-green" />
+              <h3 className="font-semibold">Platform Wallet Summary</h3>
+            </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Energy Traded</span>
-                <span className="font-medium">2,850 kWh</span>
+                <span className="text-muted-foreground">Total Consumer Wallets</span>
+                <span className="font-medium">RM 45,230.50</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Revenue</span>
-                <span className="font-medium text-power-green">RM 1,254</span>
+                <span className="text-muted-foreground">Total Prosumer Wallets</span>
+                <span className="font-medium">RM 28,750.25</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Avg. Rate</span>
-                <span className="font-medium">44 sen/kWh</span>
+                <span className="text-muted-foreground">Total Deposits (This Month)</span>
+                <span className="font-medium text-power-green">RM 12,450.00</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">CO₂ Avoided</span>
-                <span className="font-medium">1,667 kg</span>
+                <span className="text-muted-foreground">Total Withdrawals (This Month)</span>
+                <span className="font-medium text-red-500">RM 8,320.00</span>
               </div>
             </div>
           </div>
@@ -203,16 +296,16 @@ export default function AdminDashboard() {
                 <Badge className="bg-green-100 text-green-800">Operational</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Database</span>
-                <Badge className="bg-green-100 text-green-800">Healthy</Badge>
+                <span className="text-muted-foreground">TNB Integration</span>
+                <Badge className="bg-green-100 text-green-800">Connected</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Payment Gateway</span>
+                <Badge className="bg-green-100 text-green-800">Active</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Uptime</span>
                 <Badge className="bg-green-100 text-green-800">99.9%</Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Last Sync</span>
-                <span className="font-medium">2 min ago</span>
               </div>
             </div>
           </div>
