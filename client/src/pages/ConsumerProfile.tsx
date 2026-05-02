@@ -63,6 +63,8 @@ export default function ConsumerProfile() {
   };
 
   const referralCode = `PWH_${user.uid?.slice(-8).toUpperCase()}`;
+  const planName = user.activeSubscriptionPlan || 'Standard';
+  const planKwh = planName === 'Pro' ? 500 : planName === 'Plus' ? 300 : 100;
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -137,7 +139,7 @@ export default function ConsumerProfile() {
             <div>
               <p className="text-sm text-muted-foreground mb-2">Active Subscription</p>
               <Badge className="bg-power-blue text-white">
-                Standard Plan - 700 kWh/month
+                {planName} Plan - {planKwh} kWh/month
               </Badge>
             </div>
 
