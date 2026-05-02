@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import ProsumerDashboard from "./pages/ProsumerDashboard";
 import ProsumerEarnings from "./pages/ProsumerEarnings";
 import ProsumerProfile from "./pages/ProsumerProfile";
+import ProsumerAccountProfile from "./pages/ProsumerAccountProfile";
 
 // Consumer pages
 import ConsumerDashboard from "./pages/ConsumerDashboard";
@@ -44,6 +45,7 @@ function Router() {
       <Route path={"/prosumer/exports"} component={ProsumerDashboard} />
       <Route path={"/prosumer/earnings"} component={ProsumerEarnings} />
       <Route path={"/prosumer/profile"} component={ProsumerProfile} />
+      <Route path={"/prosumer/account"} component={ProsumerAccountProfile} />
 
       {/* Consumer pages */}
       <Route path={"/consumer"} component={ConsumerDashboard} />

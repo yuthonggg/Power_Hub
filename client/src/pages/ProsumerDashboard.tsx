@@ -63,7 +63,8 @@ export default function ProsumerDashboard() {
   const navItems = [
     { label: 'Overview', href: '/prosumer' },
     { label: 'Earnings', href: '/prosumer/earnings' },
-    { label: 'Profile', href: '/prosumer/profile' },
+    { label: 'Solar Profile', href: '/prosumer/profile' },
+    { label: 'Account Profile', href: '/prosumer/account' },
   ];
 
   const currentEarningsRate = (currentGeneration * 0.34).toFixed(2);

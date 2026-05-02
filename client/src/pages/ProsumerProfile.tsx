@@ -23,7 +23,8 @@ export default function ProsumerProfile() {
   const navItems = [
     { label: 'Overview', href: '/prosumer' },
     { label: 'Earnings', href: '/prosumer/earnings' },
-    { label: 'Profile', href: '/prosumer/profile' },
+    { label: 'Solar Profile', href: '/prosumer/profile' },
+    { label: 'Account Profile', href: '/prosumer/account' },
   ];
 
   const thisMonthGeneration = 1240;

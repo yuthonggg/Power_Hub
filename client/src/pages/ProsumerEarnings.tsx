@@ -67,7 +67,8 @@ export default function ProsumerEarnings() {
   const navItems = [
     { label: 'Overview', href: '/prosumer' },
     { label: 'Earnings', href: '/prosumer/earnings' },
-    { label: 'Profile', href: '/prosumer/profile' },
+    { label: 'Solar Profile', href: '/prosumer/profile' },
+    { label: 'Account Profile', href: '/prosumer/account' },
   ];
 
   const thisMonthEarnings = monthlyEarningsData[4].earnings; // May
