@@ -3,7 +3,7 @@ import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Sun, TrendingUp, Wallet } from 'lucide-react';
+import { Sun, TrendingUp, Wallet, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -22,14 +22,16 @@ const monthlyExportData = [
 
 export default function ProsumerDashboard() {
   const { user, isAuthenticated } = useAuth();
-  const { currentGeneration } = useEnergy();
+  const { currentGeneration, startSimulation, lastUpdateTime } = useEnergy();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'prosumer') {
       setLocation('/login');
+    } else {
+      startSimulation();
     }
-  }, [isAuthenticated, user, setLocation]);
+  }, [isAuthenticated, user, setLocation, startSimulation]);
 
   if (!isAuthenticated || !user || user.role !== 'prosumer') {
     return null;
@@ -42,8 +44,9 @@ export default function ProsumerDashboard() {
     { label: 'Profile', href: '/prosumer/profile' },
   ];
 
-  const todayExport = 6.8;
+  const todayExport = currentGeneration * 4; // Estimate 4 hours of peak generation per day
   const monthlyEarnings = (currentGeneration * 30 * 0.34).toFixed(2);
+  const currentEarningsRate = (currentGeneration * 0.34).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -54,25 +57,33 @@ export default function ProsumerDashboard() {
           <p className="text-muted-foreground">Monitor your energy exports and earnings</p>
         </div>
 
+        {/* Live Status */}
+        <div className="flex items-center gap-2 p-3 bg-power-green/10 rounded-lg border border-power-green/20">
+          <Activity className="w-4 h-4 text-power-green animate-pulse" />
+          <span className="text-sm text-power-green font-medium">Live • Updated {lastUpdateTime}</span>
+        </div>
+
         {/* Key Metrics */}
         <div className="grid md:grid-cols-3 gap-4">
-          {/* Today's Export */}
+          {/* Current Generation */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Today's Export</p>
-                <p className="text-3xl font-bold text-power-green">{todayExport} kWh</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Generation</p>
+                <p className="text-3xl font-bold text-power-green">{currentGeneration} kW</p>
+                <p className="text-xs text-muted-foreground mt-1">Real-time</p>
               </div>
               <Sun className="w-8 h-8 text-power-green/50" />
             </div>
           </div>
 
-          {/* Monthly Earnings */}
+          {/* Current Earnings Rate */}
           <div className="card-soft p-6 border-l-4 border-power-amber">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">This Month's Earnings</p>
-                <p className="text-3xl font-bold text-power-amber">RM {monthlyEarnings}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Earnings Rate</p>
+                <p className="text-3xl font-bold text-power-amber">RM {currentEarningsRate}</p>
+                <p className="text-xs text-muted-foreground mt-1">per hour</p>
               </div>
               <TrendingUp className="w-8 h-8 text-power-amber/50" />
             </div>

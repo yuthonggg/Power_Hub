@@ -1,8 +1,9 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Zap, TrendingDown, Leaf } from 'lucide-react';
+import { Zap, TrendingDown, Leaf, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -22,13 +23,16 @@ const usageData = [
 
 export default function ConsumerDashboard() {
   const { user, isAuthenticated } = useAuth();
+  const { currentConsumption, startSimulation, lastUpdateTime } = useEnergy();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'consumer') {
       setLocation('/login');
+    } else {
+      startSimulation();
     }
-  }, [isAuthenticated, user, setLocation]);
+  }, [isAuthenticated, user, setLocation, startSimulation]);
 
   if (!isAuthenticated || !user || user.role !== 'consumer') {
     return null;
@@ -45,6 +49,7 @@ export default function ConsumerDashboard() {
   const monthlyRate = 44;
   const monthlyCost = (monthlyUsage * monthlyRate / 100).toFixed(2);
   const savings = ((monthlyUsage * 0.5068 - monthlyUsage * 0.44) * 100 / 100).toFixed(2);
+  const currentCost = (currentConsumption * monthlyRate / 100).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -55,29 +60,36 @@ export default function ConsumerDashboard() {
           <p className="text-muted-foreground">Manage your solar subscription and usage</p>
         </div>
 
+        {/* Live Status */}
+        <div className="flex items-center gap-2 p-3 bg-power-blue/10 rounded-lg border border-power-blue/20">
+          <Activity className="w-4 h-4 text-power-blue animate-pulse" />
+          <span className="text-sm text-power-blue font-medium">Live • Updated {lastUpdateTime}</span>
+        </div>
+
         {/* Key Metrics */}
         <div className="grid md:grid-cols-3 gap-4">
           {/* Current Usage */}
           <div className="card-soft p-6 border-l-4 border-power-blue">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">This Month's Usage</p>
-                <p className="text-3xl font-bold text-power-blue">{monthlyUsage} kWh</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Usage</p>
+                <p className="text-3xl font-bold text-power-blue">{currentConsumption} kW</p>
+                <p className="text-xs text-muted-foreground mt-1">Real-time</p>
               </div>
               <Zap className="w-8 h-8 text-power-blue/50" />
             </div>
           </div>
 
-          {/* Monthly Cost */}
+          {/* Current Cost */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Monthly Cost</p>
-                <p className="text-3xl font-bold text-power-green">RM {monthlyCost}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Cost</p>
+                <p className="text-3xl font-bold text-power-green">RM {currentCost}</p>
               </div>
               <TrendingDown className="w-8 h-8 text-power-green/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">at 44 sen/kWh</p>
+            <p className="text-xs text-muted-foreground mt-2">per hour</p>
           </div>
 
           {/* Monthly Savings */}

@@ -3,7 +3,7 @@ import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Users, Zap, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, Zap, TrendingUp, AlertCircle, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -23,14 +23,16 @@ const supplyDemandData = [
 
 export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuth();
-  const { platformInventory } = useEnergy();
+  const { platformInventory, startSimulation, lastUpdateTime } = useEnergy();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'admin') {
       setLocation('/login');
+    } else {
+      startSimulation();
     }
-  }, [isAuthenticated, user, setLocation]);
+  }, [isAuthenticated, user, setLocation, startSimulation]);
 
   if (!isAuthenticated || !user || user.role !== 'admin') {
     return null;
@@ -50,6 +52,12 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Platform Overview</h1>
           <p className="text-muted-foreground">Monitor platform health and key metrics</p>
+        </div>
+
+        {/* Live Status */}
+        <div className="flex items-center gap-2 p-3 bg-power-amber/10 rounded-lg border border-power-amber/20">
+          <Activity className="w-4 h-4 text-power-amber animate-pulse" />
+          <span className="text-sm text-power-amber font-medium">Live • Updated {lastUpdateTime}</span>
         </div>
 
         {/* Key Metrics */}
@@ -90,16 +98,16 @@ export default function AdminDashboard() {
             <p className="text-xs text-muted-foreground mt-2">per kWh</p>
           </div>
 
-          {/* Inventory Status */}
+          {/* Live Inventory Status */}
           <div className="card-soft p-6 border-l-4 border-power-purple">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Inventory</p>
-                <p className="text-3xl font-bold text-power-purple">68%</p>
+                <p className="text-3xl font-bold text-power-purple">{platformInventory.toFixed(0)}%</p>
               </div>
               <AlertCircle className="w-8 h-8 text-power-purple/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Full capacity</p>
+            <p className="text-xs text-muted-foreground mt-2">Real-time</p>
           </div>
         </div>
 
