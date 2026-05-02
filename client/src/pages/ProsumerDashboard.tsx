@@ -97,7 +97,7 @@ export default function ProsumerDashboard() {
           {!exportEnabled && (
             <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
               <p className="text-sm text-amber-800">
-                ⚠️ Exports are currently disabled. Your excess solar energy will be exported under the standard TNB arrangement at ~27.03 sen/kWh instead of 34 sen/kWh.
+                ⚠️ Exports are currently disabled.
               </p>
             </div>
           )}
@@ -298,10 +298,6 @@ export default function ProsumerDashboard() {
                 <span className="text-muted-foreground">Power Hub Rate</span>
                 <span className="font-medium text-power-green">34 sen/kWh</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">vs TNB Export Credit</span>
-                <span className="font-medium text-muted-foreground">~27.03 sen/kWh</span>
-              </div>
             </div>
           </div>
 
@@ -319,13 +315,7 @@ export default function ProsumerDashboard() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Export Status</span>
                 <span className={`font-medium ${exportEnabled ? 'text-power-green' : 'text-red-500'}`}>
-                  {exportEnabled ? 'Active — Selling to Power Hub' : 'Inactive — TNB Export Only'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Extra Earnings vs TNB</span>
-                <span className="font-medium text-power-amber">
-                  +RM {((user.totalExportedKwh || 0) * (0.34 - 0.2703)).toFixed(2)}
+                  {exportEnabled ? 'Active — Selling to Power Hub' : 'Inactive'}
                 </span>
               </div>
             </div>

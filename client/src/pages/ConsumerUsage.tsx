@@ -139,11 +139,7 @@ BILLING DETAILS — SPLIT BILL
 
 TOTAL AMOUNT: RM ${currentBill.totalCost.toFixed(2)}
 
-SAVINGS COMPARISON
-==================
-If fully on TNB: RM ${(currentBill.totalUsage * tnbRate / 100).toFixed(2)}
-With Power Hub:  RM ${currentBill.totalCost.toFixed(2)}
-Your Savings:    RM ${currentBill.savings.toFixed(2)}
+
 
 Note: Power Hub portion is deducted from your e-wallet.
 TNB portion is processed through integrated TNB payment gateway.
@@ -241,7 +237,7 @@ TNB portion is processed through integrated TNB payment gateway.
                   <th className="text-right py-3 px-4 font-semibold text-power-green">Power Hub</th>
                   <th className="text-right py-3 px-4 font-semibold text-gray-500">TNB</th>
                   <th className="text-right py-3 px-4 font-semibold">Total Bill</th>
-                  <th className="text-right py-3 px-4 font-semibold text-power-green">Saved</th>
+
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -263,7 +259,7 @@ TNB portion is processed through integrated TNB payment gateway.
                       </div>
                     </td>
                     <td className="text-right py-3 px-4 font-bold">RM {bill.totalCost.toFixed(2)}</td>
-                    <td className="text-right py-3 px-4 font-semibold text-power-green">RM {bill.savings.toFixed(2)}</td>
+
                     <td className="py-3 px-4">
                       <Badge className="bg-green-100 text-green-800 border-green-200">
                         ✓ {bill.status}

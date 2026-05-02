@@ -127,7 +127,7 @@ export default function Home() {
               {
                 icon: TrendingUp,
                 title: 'Save',
-                description: 'Pay 44 sen/kWh vs TNB\'s 50–54 sen/kWh. Everyone wins.',
+                description: 'Pay a competitive 44 sen/kWh rate. Everyone wins.',
                 color: 'blue',
               },
             ].map((step, idx) => {
@@ -201,8 +201,8 @@ export default function Home() {
                   <p className="text-3xl font-bold text-power-blue">44 sen</p>
                 </div>
                 <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-2">vs TNB average</p>
-                  <p className="text-lg font-semibold text-blue-600">Save up to 20%</p>
+                  <p className="text-sm text-muted-foreground mb-2">Integrated Billing</p>
+                  <p className="text-lg font-semibold text-blue-600">Seamless split-bill experience</p>
                 </div>
               </div>
             </div>

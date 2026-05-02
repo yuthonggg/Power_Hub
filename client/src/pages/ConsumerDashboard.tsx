@@ -107,16 +107,16 @@ export default function ConsumerDashboard() {
             </div>
           </div>
 
-          {/* Monthly Savings */}
+          {/* Current Bill */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Monthly Savings</p>
-                <p className="text-3xl font-bold text-power-green">RM {savings}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Bill</p>
+                <p className="text-3xl font-bold text-power-green">RM {totalCost.toFixed(2)}</p>
               </div>
               <Leaf className="w-8 h-8 text-power-green/50" />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">vs fully on TNB</p>
+            <p className="text-xs text-muted-foreground mt-2">Total estimated for this month</p>
           </div>
 
           {/* Subscription */}
@@ -243,13 +243,9 @@ export default function ConsumerDashboard() {
               <span className="text-muted-foreground">Remaining Grid Usage (TNB)</span>
               <span className="font-medium">{tnbUsage} kWh</span>
             </div>
-            <div className="flex justify-between pt-2">
-              <span className="text-muted-foreground">If fully on TNB</span>
-              <span className="font-medium line-through text-red-400">RM {fullTnbCost.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-power-green font-semibold">
-              <span>You Save</span>
-              <span>RM {savings}</span>
+            <div className="flex justify-between pt-2 border-t border-border font-semibold text-power-blue">
+              <span>Total Estimated Bill</span>
+              <span>RM {totalCost.toFixed(2)}</span>
             </div>
           </div>
 

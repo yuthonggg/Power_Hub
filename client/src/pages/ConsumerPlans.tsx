@@ -111,17 +111,17 @@ export default function ConsumerPlans() {
               <strong>Current Rate:</strong> <span className="text-power-green font-bold">44 sen/kWh</span> — adjusted monthly (range: 42–46 sen/kWh)
             </p>
             <Badge variant="outline" className="border-power-green text-power-green">
-              Save {((savingsPerKwh / tnbRate) * 100).toFixed(0)}% vs TNB
+              Community Solar
             </Badge>
           </div>
         </div>
 
-        {/* Savings Calculator */}
+        {/* Bill Estimator */}
         <div className="card-soft p-6 bg-gradient-to-r from-power-green/10 to-power-blue/10">
-          <h2 className="text-lg font-semibold mb-4">Savings Calculator</h2>
+          <h2 className="text-lg font-semibold mb-4">Platform Bill Estimator</h2>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="usage">My average monthly usage (kWh)</Label>
+              <Label htmlFor="usage">My desired solar allocation (kWh)</Label>
               <Input
                 id="usage"
                 type="number"
@@ -131,12 +131,12 @@ export default function ConsumerPlans() {
               />
             </div>
             <div className="p-4 bg-white rounded-lg border border-power-green/20">
-              <p className="text-sm text-muted-foreground mb-2">You'd save approximately</p>
+              <p className="text-sm text-muted-foreground mb-2">Estimated Platform Cost</p>
               <p className="text-3xl font-bold text-power-green">
-                RM {savings}
+                RM {(savingsUsage * 0.44).toFixed(2)}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                per month with Power Hub vs {user.accountType === 'shoplet' ? 'TNB non-domestic LV tariff (~50.68 sen/kWh)' : 'TNB domestic rate (~54.43 sen/kWh)'}
+                per month at current rate
               </p>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function ConsumerPlans() {
           <h2 className="text-lg font-semibold mb-4">How It Works</h2>
           <div className="space-y-3 text-sm">
             <p>
-              <strong>Rate:</strong> All plans are charged at <strong>44 sen/kWh</strong> (adjusted monthly between 42–46 sen/kWh based on supply & demand). This is significantly cheaper than TNB's rate of 50–54 sen/kWh for our target users.
+              <strong>Rate:</strong> All plans are charged at <strong>44 sen/kWh</strong> (adjusted monthly between 42–46 sen/kWh based on supply & demand).
             </p>
             <p>
               <strong>Billing:</strong> At month-end, your total usage is measured. The platform allocates up to your plan's kWh limit from community solar energy. You pay Power Hub for the allocated solar portion, and TNB for the remaining grid portion.

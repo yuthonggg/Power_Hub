@@ -73,7 +73,6 @@ export default function ProsumerEarnings() {
   const thisMonthEarnings = monthlyEarningsData[4].earnings; // May
   const lifetimeEarnings = user.totalEarningsRM || 4232.50;
   const totalExported = user.totalExportedKwh || 12450;
-  const extraVsTnb = (totalExported * (0.34 - 0.2703)).toFixed(2);
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -108,16 +107,16 @@ export default function ProsumerEarnings() {
           />
           <StatCard
             icon={Zap}
-            label="Extra Earned vs TNB"
-            value={`+RM ${extraVsTnb}`}
+            label="Platform Rate"
+            value="34 sen"
+            unit="/kWh"
             color="green"
           />
         </div>
 
-        {/* How It Works Info */}
         <div className="card-soft p-4 bg-power-green/5 border border-power-green/20">
           <p className="text-sm text-power-green">
-            💡 All your exported solar energy is <strong>automatically sold</strong> through Power Hub at <strong>34 sen/kWh</strong> — that's ~26% more than the standard TNB export credit of 27.03 sen/kWh. Earnings are credited to your wallet instantly.
+            💡 All your exported solar energy is <strong>automatically sold</strong> through Power Hub at <strong>34 sen/kWh</strong>. Earnings are credited to your wallet instantly.
           </p>
         </div>
 
