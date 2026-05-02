@@ -35,7 +35,7 @@ export default function DashboardLayout({ children, navItems }: DashboardLayoutP
         `}>
           <nav className="p-6 space-y-2 overflow-y-auto h-full">
             {navItems.map((item) => {
-              const isActive = location === item.href || location.startsWith(item.href + '/');
+              const isActive = location === item.href || (location.startsWith(item.href + '/') && item.href !== '/prosumer' && item.href !== '/consumer' && item.href !== '/admin');
               return (
                 <Link key={item.href} href={item.href}>
                   <a

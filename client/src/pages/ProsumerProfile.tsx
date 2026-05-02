@@ -22,10 +22,8 @@ export default function ProsumerProfile() {
 
   const navItems = [
     { label: 'Overview', href: '/prosumer' },
-    { label: 'Energy Exports', href: '/prosumer/exports' },
-    { label: 'Earnings & Payouts', href: '/prosumer/earnings' },
-    { label: 'Solar Profile', href: '/prosumer/profile' },
-    { label: 'Settings', href: '/prosumer/settings' },
+    { label: 'Earnings', href: '/prosumer/earnings' },
+    { label: 'Profile', href: '/prosumer/profile' },
   ];
 
   const thisMonthGeneration = 1240;
@@ -83,11 +81,11 @@ export default function ProsumerProfile() {
         <div className="card-soft p-6">
           <h2 className="text-lg font-semibold mb-6">Performance</h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-4 gap-6">
             <div className="p-4 bg-power-green/10 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-5 h-5 text-power-green" />
-                <p className="text-sm text-muted-foreground">This Month Generation</p>
+                <p className="text-sm text-muted-foreground">This Month</p>
               </div>
               <p className="text-2xl font-bold text-power-green">{thisMonthGeneration} kWh</p>
             </div>
@@ -95,7 +93,7 @@ export default function ProsumerProfile() {
             <div className="p-4 bg-power-amber/10 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Sun className="w-5 h-5 text-power-amber" />
-                <p className="text-sm text-muted-foreground">Expected Generation</p>
+                <p className="text-sm text-muted-foreground">Expected</p>
               </div>
               <p className="text-2xl font-bold text-power-amber">{expectedGeneration} kWh</p>
             </div>
@@ -103,21 +101,21 @@ export default function ProsumerProfile() {
             <div className="p-4 bg-power-blue/10 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-5 h-5 text-power-blue" />
-                <p className="text-sm text-muted-foreground">Efficiency Score</p>
+                <p className="text-sm text-muted-foreground">Efficiency</p>
               </div>
               <p className="text-2xl font-bold text-power-blue">{efficiency}%</p>
             </div>
-          </div>
 
-          <div className="mt-6 p-4 bg-power-green/10 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Leaf className="w-5 h-5 text-power-green" />
-              <p className="text-sm text-muted-foreground">CO₂ Offset (Lifetime)</p>
+            <div className="p-4 bg-power-green/10 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Leaf className="w-5 h-5 text-power-green" />
+                <p className="text-sm text-muted-foreground">CO₂ Offset</p>
+              </div>
+              <p className="text-2xl font-bold text-power-green">{co2Offset} kg</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Equivalent to {Math.round(parseInt(co2Offset) / 21)} trees
+              </p>
             </div>
-            <p className="text-2xl font-bold text-power-green">{co2Offset} kg</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Equivalent to planting {Math.round(parseInt(co2Offset) / 21)} trees
-            </p>
           </div>
         </div>
 

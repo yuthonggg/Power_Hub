@@ -44,10 +44,9 @@ export default function ConsumerProfile() {
 
   const navItems = [
     { label: 'Overview', href: '/consumer' },
-    { label: 'Subscription Plans', href: '/consumer/plans' },
-    { label: 'Usage History', href: '/consumer/usage' },
-    { label: 'Account Profile', href: '/consumer/profile' },
-    { label: 'Settings', href: '/consumer/settings' },
+    { label: 'Plans', href: '/consumer/plans' },
+    { label: 'Billing', href: '/consumer/usage' },
+    { label: 'Profile', href: '/consumer/profile' },
   ];
 
   const handleCopyReferral = () => {
@@ -167,7 +166,7 @@ export default function ConsumerProfile() {
             <div className="pt-4 border-t border-border">
               <p className="text-xs text-muted-foreground">
                 Your TNB account is linked for billing integration. This allows us to provide
-                accurate savings comparisons and billing information.
+                accurate billing information.
               </p>
             </div>
           </div>

@@ -292,6 +292,10 @@ TNB portion is processed through integrated TNB payment gateway.
               <strong>5. One convenient payment</strong> — Both portions are handled through the app. Power Hub deducts from your wallet, TNB payment is processed through integrated payment gateway.
             </p>
           </div>
+          <div className="mt-4 p-4 bg-white/50 rounded-lg text-sm text-muted-foreground border border-blue-100">
+            <strong>Note on Payment Gateway Integration:</strong><br />
+            To make payment easier, the app can integrate a TNB payment terminal or payment gateway. This allows the user to pay both parties through one app, while the payment is separated in the background. The community solar portion goes to the platform, and the remaining grid electricity portion goes to TNB. This payment flow is proposed subject to regulatory approval and integration with TNB or the relevant electricity utility company.
+          </div>
         </div>
       </div>
     </DashboardLayout>
