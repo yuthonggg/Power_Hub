@@ -3,7 +3,7 @@ import { useEnergy } from '@/contexts/EnergyContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useLocation } from 'wouter';
 import { useEffect, useState } from 'react';
-import { Zap, TrendingDown, Leaf, Activity, Wallet, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { TrendingDown, Leaf, Activity, Wallet, ArrowDownLeft, ArrowUpRight, CreditCard, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -31,12 +31,21 @@ const usageData = [
   { day: '10', kwh: 27 },
 ];
 
+const paymentHistory = [
+  { date: '2025-04-30', amount: 425.80, method: 'Wallet', status: 'Paid', ref: 'PWH-20250430-001' },
+  { date: '2025-03-31', amount: 410.50, method: 'FPX (Maybank)', status: 'Paid', ref: 'PWH-20250331-001' },
+  { date: '2025-02-28', amount: 398.20, method: 'Credit Card', status: 'Paid', ref: 'PWH-20250228-001' },
+  { date: '2025-01-31', amount: 435.10, method: 'TNG eWallet', status: 'Paid', ref: 'PWH-20250131-001' },
+];
+
 export default function ConsumerDashboard() {
   const { user, isAuthenticated } = useAuth();
-  const { currentConsumption, startSimulation, lastUpdateTime } = useEnergy();
+  const { startSimulation, lastUpdateTime } = useEnergy();
   const [, setLocation] = useLocation();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
+  const [selectedPayMethod, setSelectedPayMethod] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'consumer') {
@@ -74,9 +83,12 @@ export default function ConsumerDashboard() {
   const tnbCost = tnbUsage * tnbRate / 100;
   const totalCost = solarCost + tnbCost;
 
-  // What it would cost fully on TNB
-  const fullTnbCost = totalUsage * tnbRate / 100;
-  const savings = (fullTnbCost - totalCost).toFixed(2);
+  const paymentMethods = [
+    { id: 'wallet', label: 'Power Hub Wallet', desc: `Balance: RM ${user.eWalletBalance.toFixed(2)}`, icon: '💳' },
+    { id: 'fpx', label: 'FPX Online Banking', desc: 'Maybank, CIMB, RHB, etc.', icon: '🏦' },
+    { id: 'tng', label: 'Touch \'n Go eWallet', desc: 'Pay via TNG app', icon: '📱' },
+    { id: 'credit', label: 'Credit / Debit Card', desc: 'Visa, Mastercard', icon: '💳' },
+  ];
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -93,20 +105,8 @@ export default function ConsumerDashboard() {
           <span className="text-sm text-power-blue font-medium">Live • Updated {lastUpdateTime}</span>
         </div>
 
-        {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-4">
-          {/* Current Usage */}
-          <div className="card-soft p-6 border-l-4 border-power-blue">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Current Usage</p>
-                <p className="text-3xl font-bold text-power-blue">{currentConsumption} kW</p>
-                <p className="text-xs text-muted-foreground mt-1">Real-time</p>
-              </div>
-              <Zap className="w-8 h-8 text-power-blue/50" />
-            </div>
-          </div>
-
+        {/* Key Metrics — 3 cards (no Current Usage) */}
+        <div className="grid md:grid-cols-3 gap-4">
           {/* Current Bill */}
           <div className="card-soft p-6 border-l-4 border-power-green">
             <div className="flex items-start justify-between">
@@ -166,6 +166,8 @@ export default function ConsumerDashboard() {
                       <div className="grid grid-cols-2 gap-2 mt-2">
                         <Button variant="outline" size="sm">FPX</Button>
                         <Button variant="outline" size="sm">Credit Card</Button>
+                        <Button variant="outline" size="sm">TNG eWallet</Button>
+                        <Button variant="outline" size="sm">Debit Card</Button>
                       </div>
                     </div>
                     <Button className="w-full bg-power-green hover:bg-power-green/90">Confirm Deposit</Button>
@@ -208,22 +210,28 @@ export default function ConsumerDashboard() {
           </div>
         </div>
 
-        {/* Monthly Bill Preview — Split Bill */}
+        {/* Monthly Bill Preview — Pay Your Bill */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold mb-4">Monthly Bill Preview — Split Billing</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Monthly Bill — May 2025</h2>
+            <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+              <Clock className="w-3 h-3 mr-1" /> Unpaid
+            </Badge>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 bg-power-green/10 rounded-lg border border-power-green/20">
-              <p className="text-xs text-muted-foreground mb-1">Power Hub Portion</p>
+              <p className="text-xs text-muted-foreground mb-1">Community Solar Portion</p>
               <p className="text-2xl font-bold text-power-green">RM {solarCost.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground mt-1">{solarAllocation} kWh × 44 sen</p>
             </div>
             <div className="p-4 bg-gray-100 rounded-lg border border-gray-200">
-              <p className="text-xs text-muted-foreground mb-1">TNB Portion</p>
+              <p className="text-xs text-muted-foreground mb-1">Grid Electricity Portion</p>
               <p className="text-2xl font-bold text-gray-700">RM {tnbCost.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground mt-1">{tnbUsage} kWh × {tnbRate.toFixed(2)} sen</p>
             </div>
             <div className="p-4 bg-power-blue/10 rounded-lg border border-power-blue/20">
-              <p className="text-xs text-muted-foreground mb-1">Total Bill</p>
+              <p className="text-xs text-muted-foreground mb-1">Total Amount Due</p>
               <p className="text-2xl font-bold text-power-blue">RM {totalCost.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground mt-1">{totalUsage} kWh total usage</p>
             </div>
@@ -244,15 +252,116 @@ export default function ConsumerDashboard() {
               <span className="font-medium">{tnbUsage} kWh</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-border font-semibold text-power-blue">
-              <span>Total Estimated Bill</span>
+              <span>Total Amount Due</span>
               <span>RM {totalCost.toFixed(2)}</span>
             </div>
           </div>
 
+          {/* Pay Now Button */}
+          <div className="mt-6">
+            <Dialog open={payOpen} onOpenChange={setPayOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-power-blue hover:bg-power-blue/90 text-white gap-2 h-12 text-base">
+                  <CreditCard className="w-5 h-5" /> Pay RM {totalCost.toFixed(2)}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Pay Your Bill</DialogTitle>
+                  <DialogDescription>
+                    Choose a payment method. You pay the full amount — the solar portion goes to Power Hub and the grid portion goes to TNB, split automatically in the background.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="p-3 bg-power-blue/10 rounded-lg border border-power-blue/20 text-center">
+                    <p className="text-xs text-muted-foreground">Amount Due</p>
+                    <p className="text-2xl font-bold text-power-blue">RM {totalCost.toFixed(2)}</p>
+                  </div>
+
+                  <div>
+                    <Label className="mb-2 block">Select Payment Method</Label>
+                    <div className="space-y-2">
+                      {paymentMethods.map((pm) => (
+                        <button
+                          key={pm.id}
+                          onClick={() => setSelectedPayMethod(pm.id)}
+                          className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
+                            selectedPayMethod === pm.id
+                              ? 'border-power-blue bg-power-blue/5 ring-2 ring-power-blue/20'
+                              : 'border-border hover:border-power-blue/40 hover:bg-secondary/50'
+                          }`}
+                        >
+                          <span className="text-xl">{pm.icon}</span>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">{pm.label}</p>
+                            <p className="text-xs text-muted-foreground">{pm.desc}</p>
+                          </div>
+                          {selectedPayMethod === pm.id && (
+                            <CheckCircle className="w-5 h-5 text-power-blue" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                    <p className="text-xs text-amber-800">
+                      <strong>Auto-Pay:</strong> You can also enable auto-deduct from your wallet in{' '}
+                      <span className="underline cursor-pointer" onClick={() => { setPayOpen(false); setLocation('/consumer/profile'); }}>
+                        Profile Settings
+                      </span>
+                      .
+                    </p>
+                  </div>
+
+                  <Button
+                    className="w-full bg-power-blue hover:bg-power-blue/90 h-11"
+                    disabled={!selectedPayMethod}
+                  >
+                    Confirm Payment
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
           <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-xs text-muted-foreground">
-              💡 Your bill is automatically split between Power Hub and TNB. The Power Hub portion is deducted from your e-wallet. The TNB portion is paid through integrated TNB payment.
+              💡 You pay the <strong>full amount</strong> through this app. The payment is automatically split in the background — the community solar portion goes to Power Hub, and the remaining grid electricity portion goes to TNB. This payment flow is proposed subject to regulatory approval and integration with TNB or the relevant electricity utility company.
             </p>
+          </div>
+        </div>
+
+        {/* Payment History */}
+        <div className="card-soft p-6">
+          <h2 className="text-lg font-semibold mb-4">Payment History</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 font-semibold">Date</th>
+                  <th className="text-right py-3 px-4 font-semibold">Amount</th>
+                  <th className="text-left py-3 px-4 font-semibold">Method</th>
+                  <th className="text-left py-3 px-4 font-semibold">Reference</th>
+                  <th className="text-left py-3 px-4 font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentHistory.map((pay, idx) => (
+                  <tr key={idx} className="border-b border-border hover:bg-secondary/50">
+                    <td className="py-3 px-4">{pay.date}</td>
+                    <td className="text-right py-3 px-4 font-semibold">RM {pay.amount.toFixed(2)}</td>
+                    <td className="py-3 px-4">{pay.method}</td>
+                    <td className="py-3 px-4 text-muted-foreground font-mono text-xs">{pay.ref}</td>
+                    <td className="py-3 px-4">
+                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                        <CheckCircle className="w-3 h-3 mr-1" /> {pay.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
